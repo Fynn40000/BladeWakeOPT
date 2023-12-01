@@ -1,0 +1,52 @@
+-------------------------------------------------------------------------
+
+	SOLVER SETTINGS
+		  maxparticles----> 40401
+		   formulation----> formulation_rVPM
+		       viscous----> (Symbol("*userfunction"), "FLOWVPM.Inviscid{Float64}(0.0)")
+		        kernel----> gaussianerf
+		            UJ----> UJ_fmm
+		          Uinf----> (Symbol("*userfunction"), "#147")
+		           SFS----> SFS_none
+		   integration----> rungekutta3
+		    transposed----> true
+		    relaxation----> pedrizzetti
+		           fmm----> FLOWVPM.FMM(4, 50, 0.4, 0.5)
+
+	SIMULATION SETTINGS
+		dt:			0.0006886066398390341
+		Runtime function:	Yes
+		Static particles:	Yes
+		nsteps_save:		1
+
+-------------------------------------------------------------------------
+*************************************************************************
+START wing-example/wing-example_pfield
+	2023-11-30T13:42:28.603
+*************************************************************************
+	Time step 0 out of 200	Particles: 0
+	Time step 10 out of 200	Particles: 1754
+	Time step 20 out of 200	Particles: 3756
+	Time step 30 out of 200	Particles: 5564
+	Time step 40 out of 200	Particles: 6800
+	Time step 50 out of 200	Particles: 7810
+	Time step 60 out of 200	Particles: 8820
+	Time step 70 out of 200	Particles: 9830
+	Time step 80 out of 200	Particles: 10840
+	Time step 90 out of 200	Particles: 11850
+	Time step 100 out of 200	Particles: 12860
+	Time step 110 out of 200	Particles: 13870
+	Time step 120 out of 200	Particles: 14880
+	Time step 130 out of 200	Particles: 15890
+	Time step 140 out of 200	Particles: 16900
+	Time step 150 out of 200	Particles: 17910
+	Time step 160 out of 200	Particles: 18920
+	Time step 170 out of 200	Particles: 19930
+	Time step 180 out of 200	Particles: 20940
+	Time step 190 out of 200	Particles: 21950
+	Time step 200 out of 200	Particles: 22960
+*************************************************************************
+END wing-example/wing-example_pfield
+	2023-11-30T13:46:27.574
+*************************************************************************
+ELAPSED TIME: 0 hours 3 minutes 58 seconds
