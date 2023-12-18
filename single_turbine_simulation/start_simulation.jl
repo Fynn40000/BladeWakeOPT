@@ -9,7 +9,7 @@
   * Last updated    : Dec 2023
   * License         : -
 =###############################################################################
-
+#include(joinpath("/home/fynn/Repositories/BladeWakeOPT/single_turbine_simulation/start_simulation.jl"))
 
 import FLOWUnsteady as uns
 import FLOWVLM as vlm
@@ -27,9 +27,10 @@ paraview        = true                      # Whether to visualize with Paraview
 rotor_file      = "NREL5MW.csv"                                             # Rotor geometry #apc10x7.csv
 data_path       = joinpath(start_simulation_path, "..", "database")         # Path to rotor database
 pitch           = 0.0                                                       # (deg) collective pitch of blades
-CW              = false                                                     # Clock-wise rotation
-xfoil           = true                                                      # Whether to run XFOIL
+CW              = true                                                      # Clock-wise rotation
+xfoil           = false                                                     # Whether to run XFOIL
 ncrit           = 9                                                         # Turbulence criterion for XFOIL
+turbine_flag    = true                                                      # This rotor is a turbine
 
 # NOTE: If `xfoil=true`, XFOIL will be run to generate the airfoil polars used
 #       by blade elements before starting the simulation. XFOIL is run
@@ -39,8 +40,8 @@ ncrit           = 9                                                         # Tu
 #       `xfoil=false` and pointing to polar files through `rotor_file`.
 
 # Discretization
-n               = 20                        # Number of blade elements per blade
-r               = 1/5                       # Geometric expansion of elements
+n               = 50                        # Number of blade elements per blade
+r               = 1/10                       # Geometric expansion of elements
 
 # NOTE: Here a geometric expansion of 1/5 means that the spacing between the
 #       tip elements is 1/5 of the spacing between the hub elements. Refine the
@@ -54,7 +55,7 @@ R, B            = uns.read_rotor(rotor_file; data_path=data_path)[[1,3]]
 
 # Operating conditions
 RPM             = 12.1                      # RPM
-J               = 11.4/((RPM/60)*2*R)      # Advance ratio Vinf/(nD)
+J               = 11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
 AOA             = 0                         # (deg) Angle of attack (incidence angle)
 
 rho             = 1.225                     # (kg/m^3) air density
@@ -129,6 +130,7 @@ rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         altReD=[RPM, J, mu/rho],
                                         xfoil=xfoil,
                                         ncrit=ncrit,
+                                        turbine_flag=turbine_flag,
                                         data_path=data_path,
                                         verbose=true,
                                         verbose_xfoil=false,
@@ -136,6 +138,13 @@ rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         );
 
 println("Generating vehicle...")
+println(rotor.CW)
+println(rotor.turbine_flag)
+println(rotor.RPM) #warum steht der Wert auf "nothing"????
+println(rotor.hubR)
+println(rotor.rotorR)
+println(rotor.m)
+println(rotor.sol)
 
 # Generate vehicle
 system = vlm.WingSystem()                   # System of all FLOWVLM objects
