@@ -1,8 +1,0 @@
-﻿property,file,description
-chorddist,NREL5MW_chorddist.csv, Chord distribution
-pitchdist,NREL5MW_twistdist.csv, Twist distribution
-sweepdist,NREL5MW_sweepdist_halfline.csv, LE sweep distribution
-heightdist,NREL5MW_heightdist_zero.csv, LE height distribution
-airfoil_files,NREL5MW_airfoils_pos.csv, Airfoil distribution
-spl_k,2,  Spline order
-spl_s,5.00E-07, Spline smoothing
