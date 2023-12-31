@@ -1,0 +1,46 @@
+	-----------------------------------------------------------------
+	
+		SOLVER SETTINGS
+			  maxparticles----> 1800
+			   formulation----> formulation_cVPM
+			       viscous----> (Symbol("*userfunction"), "FLOWVPM.Inviscid{Float64}(0.0)")
+			        kernel----> winckelmans
+			            UJ----> UJ_fmm
+			          Uinf----> nofreestream
+			           SFS----> SFS_none
+			   integration----> rungekutta3
+			    transposed----> true
+			    relaxation----> correctedpedrizzetti
+			           fmm----> FLOWVPM.FMM(4, 50, 0.4, 0.5)
+
+		SIMULATION SETTINGS
+			dt:			0.0255922319516671
+			Runtime function:	Yes
+			Static particles:	Nothing
+			nsteps_save:		1
+	
+	-----------------------------------------------------------------
+	*****************************************************************
+	START leapfrog_simulation00/vortexring
+		2023-12-31T13:05:39.523
+	*****************************************************************
+		Time step 0 out of 700	Particles: 1800
+		Time step 100 out of 700	Particles: 1800
+			enstrophy:	139.6800758776173
+		Time step 200 out of 700	Particles: 1800
+			enstrophy:	159.90317492010263
+		Time step 300 out of 700	Particles: 1800
+			enstrophy:	190.18246644766333
+		Time step 400 out of 700	Particles: 1800
+			enstrophy:	371.2544312301166
+		Time step 500 out of 700	Particles: 1800
+			enstrophy:	485.2672538948673
+		Time step 600 out of 700	Particles: 1800
+			enstrophy:	458.85360506981726
+		Time step 700 out of 700	Particles: 1800
+			enstrophy:	484.25073834486295
+	*****************************************************************
+	END leapfrog_simulation00/vortexring
+		2023-12-31T13:06:21.871
+	*****************************************************************
+	ELAPSED TIME: 0 hours 0 minutes 42 seconds

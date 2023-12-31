@@ -1,0 +1,16 @@
+﻿XFOIL & experimental polar
+Polar key
+Airfoil,Cylinder2
+Reynolds number,750000
+Ncrit,9
+Mach,0
+Max Cl/Cd
+Max Cl/Cd alpha
+
+
+Alpha,Cl,Cd,Cdp,Cm,Top_Xtr,Bot_Xtr
+-50.00,0.0,0.35,0.0,0.0,0.0,0.0
+-30.00,0.0,0.35,0.0,0.0,0.0,0.0
+0.00,0.0,0.35,0.0,0.0,0.0,0.0
+30.00,0.0,0.35,0.0,0.0,0.0,0.0
+50.00,0.0,0.35,0.0,0.0,0.0,0.0
