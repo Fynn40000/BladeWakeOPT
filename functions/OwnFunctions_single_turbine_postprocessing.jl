@@ -42,9 +42,9 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   nums      = range(rev_to_average_idx-nrevs_to_average, rev_to_average_idx; length = nsteps_per_rev[run_name]+1)# Process outputs between revolutions 3 and 4!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   nums      = ceil.(Int, nums * nsteps_per_rev[run_name])
 
-  #uns.postprocess_statistics(r_path, s_path, nums;
-  #                                      cyl_axial_dir = rotor_axis,
-  #                                      prompt = false)
+  uns.postprocess_statistics(r_path, s_path, nums;
+                                        cyl_axial_dir = rotor_axis,
+                                        prompt = false)
 
   # Start plotting
   fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
