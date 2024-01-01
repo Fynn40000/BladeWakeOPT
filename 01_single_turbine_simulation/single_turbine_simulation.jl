@@ -9,15 +9,17 @@
   * Last updated    : Dec 2023
   * License         : -
 =###############################################################################
-#include(joinpath("/home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/start_simulation.jl"))
+#include(joinpath("/home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/single_turbine_simulation.jl"))
 
 import FLOWUnsteady as uns
 import FLOWVLM as vlm
 import FLOWVPM as vpm
 
-run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
-
 start_simulation_path = splitdir(@__FILE__)[1]
+include(joinpath(start_simulation_path, "..", "functions", "OwnFunctions.jl"))
+using .OwnFunctions # include all self defined functions
+
+run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
 save_path       = joinpath(start_simulation_path, "data_out", run_name) # Where to save this simulation #splitdir(@__FILE__)[1] * "/data_out" * "/" * run_name                 
 paraview        = true                      # Whether to visualize with Paraview
 
@@ -270,4 +272,4 @@ end
 # ------------- 6) POSTPROCESSING ----------------------------------------------
 
 #Post-process monitor plots
-include(joinpath(start_simulation_path, "single_turbine_simulation-postprocessing.jl"))
+include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))

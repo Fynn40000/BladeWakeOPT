@@ -7,10 +7,9 @@
 =###############################################################################
 
 
-"
-Plots the blade loads of a single turbines simulation.
-"
+println("\nPostprocessing...\n")
 
-function single_turbine_postprocessing()
 
-end
+OwnFunctions.single_turbine_postprocessing(run_name)
+
+
