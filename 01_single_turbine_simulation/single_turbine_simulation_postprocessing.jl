@@ -7,9 +7,14 @@
 =###############################################################################
 
 
-println("\nPostprocessing...\n")
+function single_turbine_simulation_postprocessing(save_path::String, save_path_post::String, run_name::String)
 
+  println("\nPostprocessing...\n")
+  
+  
+  OwnFunctions.plot_blade_loading(save_path, save_path_post, run_name)
 
-OwnFunctions.single_turbine_postprocessing(run_name)
-
+  
+  
+end
 

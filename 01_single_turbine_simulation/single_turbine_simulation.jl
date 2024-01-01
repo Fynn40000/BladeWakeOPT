@@ -16,18 +16,26 @@ import FLOWVLM as vlm
 import FLOWVPM as vpm
 
 start_simulation_path = splitdir(@__FILE__)[1]
-include(joinpath(start_simulation_path, "..", "functions", "OwnFunctions.jl"))
-using .OwnFunctions # include all self defined functions
+include(joinpath(start_simulation_path, "..", "functions", "OwnFunctions.jl"))  # Read file with module definition first
+using .OwnFunctions                                                             # Include all self defined functions
 
 run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
 save_path       = joinpath(start_simulation_path, "data_out", run_name) # Where to save this simulation #splitdir(@__FILE__)[1] * "/data_out" * "/" * run_name                 
+save_path_post  = joinpath(save_path, "postprocessing") # Where to save postprocessing plots
 paraview        = true                      # Whether to visualize with Paraview
+
+######## TESTAREA ##############
+#Post-process monitor plots
+include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
+single_turbine_simulation_postprocessing(save_path, save_path_post, run_name)
+######## ENDE TESTAREA #########
+
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
 # Rotor geometry
 rotor_file      = "NREL5MW.csv"                                             # Rotor geometry #apc10x7.csv
-data_path       = joinpath(start_simulation_path, "..", "00_database")         # Path to rotor database
+data_path       = joinpath(start_simulation_path, "..", "00_database")      # Path to rotor database
 pitch           = 0.0                                                       # (deg) collective pitch of blades
 CW              = true                                                      # Clock-wise rotation
 xfoil           = false                                                     # Whether to run XFOIL
@@ -273,3 +281,4 @@ end
 
 #Post-process monitor plots
 include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
+single_turbine_simulation_postprocessing(save_path, save_path_post, run_name)
