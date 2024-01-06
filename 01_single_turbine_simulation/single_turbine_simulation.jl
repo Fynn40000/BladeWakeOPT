@@ -22,14 +22,12 @@ using .OwnFunctions                                                             
 run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
 save_path       = joinpath(start_simulation_path, "data_out", run_name) # Where to save this simulation #splitdir(@__FILE__)[1] * "/data_out" * "/" * run_name                 
 save_path_post  = joinpath(save_path, "postprocessing") # Where to save postprocessing plots
+
+# ----------------- Postprocessing and Visualization ----------------------------------------
 paraview        = true                      # Whether to visualize with Paraview
-
-######## TESTAREA ##############
-#Post-process monitor plots
-include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-single_turbine_simulation_postprocessing(save_path, save_path_post, run_name)
-######## ENDE TESTAREA #########
-
+plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
+postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
+debug=true
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
@@ -82,6 +80,7 @@ Matip           = 2*pi*RPM/60*R / speedofsound      # Tip Mach number
 println("""
     RPM:    $(RPM)
     Vinf:   $(Vinf(zeros(3), 0)) m/s
+    tsr:    $((2*pi*RPM/60*R)/(J*((RPM/60)*2*R)))
     Matip:  $(round(Matip, digits=3))
     ReD:    $(round(ReD, digits=0))
 """)
@@ -138,7 +137,7 @@ println("Generating geometry...")
 # Generate rotor
 rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         n=n, CW=CW, blade_r=r,
-                                        altReD=[RPM, J, mu/rho],
+                                        altReD=[RPM, J, mu/rho],#!!!!
                                         xfoil=xfoil,
                                         ncrit=ncrit,
                                         turbine_flag=turbine_flag,
@@ -255,7 +254,7 @@ uns.run_simulation(simulation, nsteps;
                     # ----- OUTPUT OPTIONS ------------------
                     save_path=save_path,
                     run_name=run_name,
-                    debug=true,
+                    debug=debug
                     );
 
 
@@ -281,4 +280,14 @@ end
 
 #Post-process monitor plots
 include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-single_turbine_simulation_postprocessing(save_path, save_path_post, run_name)
+single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R;
+                                        # ----- POSTPROCESSING EXECUTION -------------
+                                         plot_bladeloads=plot_bladeloads, 
+                                         postprocess_fdom=postprocess_fdom,
+                                        # ----- SETTINGS FOR POSTPROCESSING -------------
+                                         rev_to_average_idx=nrevs, 
+                                         nrevs_to_average=1,
+                                         num_elements=n,
+                                         debug=debug)
+#plot_identifier = "NREL 5MW Turbine"
+#single_turbine_simulation_postprocessing(save_path, save_path_post, "NREL 5MW Turbine"; rev_to_average_idx=nrevs, nrevs_to_average=1)

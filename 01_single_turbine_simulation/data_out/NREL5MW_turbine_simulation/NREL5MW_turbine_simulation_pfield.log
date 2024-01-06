@@ -22,7 +22,7 @@
 -------------------------------------------------------------------------
 *************************************************************************
 START /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-01T22:50:26.532
+	2024-01-06T17:11:11.457
 *************************************************************************
 	Time step 0 out of 144	Particles: 0
 	Time step 10 out of 144	Particles: 3194
@@ -41,6 +41,6 @@ START /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out
 	Time step 140 out of 144	Particles: 43558
 *************************************************************************
 END /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-01T22:58:29.887
+	2024-01-06T17:20:32.304
 *************************************************************************
-ELAPSED TIME: 0 hours 8 minutes 3 seconds
+ELAPSED TIME: 0 hours 9 minutes 20 seconds

@@ -1,16 +1,7 @@
 #=##############################################################################
-# DESCRIPTION
-    Plotting and outputting-processing functions for monitoring vehicle and
-    component performance. The functions in this module generate
-    monitor-functions that can be passed to the simulation engine through the
-    optional arguments `extra_runtime_function`. 
-    The content within this file is inspired by FLOWUnsteady_monitors.jl file created by: 
-    Main developer  : Eduardo J. Alvarez (edoalvarez.com)
-    and contained in:
-    Repo            : github.com/byuflowlab/FLOWUnsteady 
-
-# ABOUT
-  * Created   : Dec 2023
+# NOTE:
+    This code has to be copied and pasted into the file "src/FLOWUnsteady_monitors.jl" 
+    in the FLOWUnsteady Repository under the Julia packages
 =###############################################################################
 
 """
@@ -24,7 +15,7 @@ at every time step.
 The aerodynamic performance consists of thrust coefficient
 \$C_T = \\frac{T}{q*A}\$, torque coefficient
 \$C_Q = \\frac{Q}{q*R*A}\$, and power coefficient
-(((((((((\$C_P = \\frac{???}{q*A*u_\\infty}\$)))))))))
+(((((((((\$C_P = \\frac{P}{q*A*u_\\infty}\$)))))))))
 
 with
 \$q = 0.5*rho*u_\\infty^2\$, free stream kinetic energy
@@ -106,19 +97,19 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
                 ax.set_ylabel(L"Tangential load $T_p$ (N/m)")
 
                 ax = axs[4]
-                ax.set_title(L"$C_T = \frac{T}{\rho n^2 d^4}$", color="gray")
+                ax.set_title(L"$C_T = \frac{T}{0.5 \rho A u_\infty^2}$", color="gray")
                 ax.set_xlabel(t_lbl)
-                ax.set_ylabel(L"Thrust $C_T$")
+                ax.set_ylabel(L"Thrust Coefficient $C_T$")
 
                 ax = axs[5]
-                ax.set_title(L"$C_Q = \frac{Q}{\rho n^2 d^5}$", color="gray")
+                ax.set_title(L"$C_Q = \frac{Q}{0.5 \rho A u_\infty^2 R}$", color="gray")
                 ax.set_xlabel(t_lbl)
-                ax.set_ylabel(L"Torque $C_Q$")
+                ax.set_ylabel(L"Torque Coefficient $C_Q$")
 
                 ax = axs[6]
-                ax.set_title(L"$\eta = \frac{T u_\infty}{2\pi n Q}$", color="gray")
+                ax.set_title(L"$C_P = \frac{P}{0.5 \rho A u_\infty^3}$", color="gray")
                 ax.set_xlabel(t_lbl)
-                ax.set_ylabel(L"Propulsive efficiency $\eta$")
+                ax.set_ylabel(L"Power Coefficient $C_P$")
 
 
                 for ax in axs
@@ -135,7 +126,7 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
                 f = open(fname, "w")
                 print(f, "ref age (deg),T,DT")
                 for (i, rotor) in enumerate(rotors)
-                    print(f, ",RPM_$i,CT_$i,CQ_$i,eta_$i")
+                    print(f, ",RPM_$i,CT_$i,CQ_$i,CP_$i")
                 end
                 print(f, "\n")
                 close(f)
@@ -192,17 +183,34 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
         # Plot performance parameters
         for (i, rotor) in enumerate(rotors)
 
-            CT, CQ = vlm.calc_thrust_torque_coeffs(rotor, rho_ref, magVinfx, turbine_flag)
-            eta = J_ref*CT/(2*pi*CQ)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            #CT, CQ = vlm.calc_thrust_torque_coeffs(rotor, rho_ref, magVinfx, turbine_flag)
+            thrust, torque = vlm.calc_thrust_torque(rotor)
+            power = torque * (2*pi*rotor.RPM)/60
+            q = 0.5*rho_ref*magVinfx^2
+            A = pi*rotor.rotorR^2
+            CT = thrust/(q*A)
+            CQ = torque/(q*rotor.rotorR*A)
+            CP = power/(q*A*magVinfx)
+
+            roR = rotor.sol["roR"]["field_data"][1]
+            #println("roR")
+            #println(roR)
+            #cn = rotor.sol["cn"]["field_data"][1]
+            #println("cn")
+            #println(cn)
+            #ct = rotor.sol["ct"]["field_data"][1]
+            #println("ct")
+            #println(ct)
+            #println(" ")
 
             if PFIELD.nt%nsteps_plot==0 && disp_conv
                 axs[4].plot([t_scaled], [CT], "$(stls[i])", alpha=alpha, color=clr)
                 axs[5].plot([t_scaled], [CQ], "$(stls[i])", alpha=alpha, color=clr)
-                axs[6].plot([t_scaled], [eta], "$(stls[i])", alpha=alpha, color=clr)
+                axs[6].plot([t_scaled], [CP], "$(stls[i])", alpha=alpha, color=clr)
             end
 
             if save_path!=nothing
-                print(f, ",", rotor.RPM, ",", CT, ",", CQ, ",", eta)
+                print(f, ",", rotor.RPM, ",", CT, ",", CQ, ",", CP)
             end
         end
 
