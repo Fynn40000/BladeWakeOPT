@@ -282,12 +282,12 @@ end
 include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
 single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R;
                                         # ----- POSTPROCESSING EXECUTION -------------
-                                         plot_bladeloads=plot_bladeloads, 
-                                         postprocess_fdom=postprocess_fdom,
+                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
+                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                         # ----- SETTINGS FOR POSTPROCESSING -------------
-                                         rev_to_average_idx=nrevs, 
-                                         nrevs_to_average=1,
-                                         num_elements=n,
-                                         debug=debug)
-#plot_identifier = "NREL 5MW Turbine"
-#single_turbine_simulation_postprocessing(save_path, save_path_post, "NREL 5MW Turbine"; rev_to_average_idx=nrevs, nrevs_to_average=1)
+                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
+                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
+                                         num_elements=n,                        # number of blade elements per blade
+                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
+                                         suppress_plots=true                    # suppresses the plots to show up on the display
+                                         )

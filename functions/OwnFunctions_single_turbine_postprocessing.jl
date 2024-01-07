@@ -32,7 +32,8 @@ function postprocess_statistics(save_path::String, run_name::String;
 
   uns.postprocess_statistics(r_path, s_path, nums;
                              cyl_axial_dir = rotor_axis,
-                             prompt = false)
+                             prompt = false,
+                             verbose=false)
 
 end
 
@@ -45,7 +46,9 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
                             file_marker::String="_vlm", rev_to_average_idx=1, 
                             nrevs_to_average=1, 
                             num_elements::Int64=1, 
-                            debug::Bool=false)
+                            debug::Bool=false,
+                            suppress_plots::Bool=true # suppresses the plots to show up on the display
+                            )
   
   # Plot styles
   stl = "-" # style
@@ -78,33 +81,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
                                                               debug=debug
                                                               )
     rs = roR .* R
-    #println("CALCULATED DATA OF loft FILE")
-    #println("length of rs")
-    #println(length(rs))
-    #println("length of cn")
-    #println(length(cn))
-    #println(" ")
-    #println("rs")
-    #println(rs)
-    #println(" ")
-    #println("Gamma")
-    #println(Gamma)
-    #println("Np")
-    #println(Np)
-    #println("Tp")
-    #println(Tp)
-    #println("cn")
-    #println(cn)
-    #println("ct")
-    #println(ct)
-    #println("cl")
-    #println(cl)
-    #println("cd")
-    #println(cd)
-    #println("a")
-    #println(a)
-    #println("a_tangential")
-    #println(a_tangential)
+
   end
 
   #--------------------------------------------
@@ -115,7 +92,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   filename="Gamma_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
   plot_var(rs/R, Gamma, xlabel, ylabel, linelabel,save_path_post, filename;
            xlims=[0,1],
-           dx=0.1
+           dx=0.1,
+           suppress_plots=suppress_plots
            )
 
   #--------------------------------------------
@@ -126,7 +104,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   filename="Np_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
   plot_var(rs/R, Np, xlabel, ylabel, linelabel,save_path_post, filename;
            xlims=[0,1],
-           dx=0.1
+           dx=0.1,
+           suppress_plots=suppress_plots
            )
 
   #--------------------------------------------
@@ -137,7 +116,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   filename="Tp_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
   plot_var(rs/R, Tp, xlabel, ylabel, linelabel,save_path_post, filename;
            xlims=[0,1],
-           dx=0.1
+           dx=0.1,
+           suppress_plots=suppress_plots
            )
 
   if debug
@@ -150,7 +130,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="cn_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, cn, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
@@ -161,7 +142,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="ct_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, ct, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
@@ -172,7 +154,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="cl_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, cl, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
@@ -183,7 +166,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="cd_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, cd, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
@@ -194,7 +178,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="a_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, a, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
@@ -205,7 +190,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     filename="a_tangential_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, a_tangential, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
-            dx=0.1
+            dx=0.1,
+            suppress_plots=suppress_plots
             )
 
   end
@@ -227,7 +213,8 @@ function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
                   legend_frameon=false,
                   legend_fontsize=10,
                   plotYzero::Bool=true,          # plot dashed black line at y=0
-                  filetype::String=".pdf"        # plot file type the plot is saved as
+                  filetype::String=".pdf",       # plot file type the plot is saved as
+                  suppress_plots::Bool=true      # suppresses the plots to show up on the display
                   )
 
   fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
@@ -265,6 +252,8 @@ function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
 
   # save the plot
   fig.savefig(joinpath(save_path_post, filename*filetype))
-  close(fig)
+  if suppress_plots
+    close(fig)
+  end
 
 end
