@@ -25,7 +25,7 @@ function postprocess_statistics(save_path::String, run_name::String;
 
   # Generate statistics (mean and deviation of loading)
   r_path = save_path
-  s_path = r_path*"-statistics"
+  s_path = joinpath(r_path, run_name*"-statistics")
 
   nums      = range(rev_to_average_idx-nrevs_to_average, rev_to_average_idx; length = nsteps_per_rev[run_name]+1)# Process outputs between revolutions 3 and 4!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   nums      = ceil.(Int, nums * nsteps_per_rev[run_name])
@@ -59,7 +59,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   rotor_axis = [-1.0, 0.0, 0.0]       # Rotor centerline axis
 
   # Read and plot FLOWUnsteady mean blade loading and deviation
-  r_path = joinpath(save_path, "..", run_name*"-statistics")
+  r_path = joinpath(save_path, run_name*"-statistics")
 
   if file_marker == "_vlm"
     (rs, Gamma, Np, Tp) = uns.postprocess_bladeloading_turbine(r_path;

@@ -64,7 +64,7 @@ R, B            = uns.read_rotor(rotor_file; data_path=data_path)[[1,3]]
 # Operating conditions
 RPM             = 12.1                      # RPM
 J               = 11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
-AOA             = 0                         # (deg) Angle of attack (incidence angle)
+AOA             = 0.0                       # (deg) Angle of attack (incidence angle)
 
 rho             = 1.225                     # (kg/m^3) air density
 mu              = 1.81e-5                   # (kg/ms) air dynamic viscosity
@@ -258,7 +258,23 @@ uns.run_simulation(simulation, nsteps;
                     );
 
 
-# ----------------- 6) VISUALIZATION -------------------------------------------
+# ------------- 6) POSTPROCESSING ----------------------------------------------
+
+#Post-process monitor plots
+include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
+single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
+                                        # ----- POSTPROCESSING EXECUTION -------------
+                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
+                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
+                                        # ----- SETTINGS FOR POSTPROCESSING -------------
+                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
+                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
+                                         num_elements=n,                        # number of blade elements per blade
+                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
+                                         suppress_plots=true                    # suppresses the plots to show up on the display
+                                         )
+
+# ----------------- 7) VISUALIZATION -------------------------------------------
 if paraview
     println("Calling Paraview...")
 
@@ -270,24 +286,11 @@ if paraview
         files *= run_name*"_Rotor_Blade$(bi)_vlm...vtk;"
     end
 
+    if postprocess_fdom
+        files *= joinpath(save_path, run_name*"-fdom", run_name*"_fdom...xmf;")
+    end
+
     # Call Paraview
     run(`paraview --data=$(files)`)
 
 end
-
-
-# ------------- 6) POSTPROCESSING ----------------------------------------------
-
-#Post-process monitor plots
-include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R;
-                                        # ----- POSTPROCESSING EXECUTION -------------
-                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
-                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
-                                        # ----- SETTINGS FOR POSTPROCESSING -------------
-                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
-                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
-                                         num_elements=n,                        # number of blade elements per blade
-                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
-                                         suppress_plots=true                    # suppresses the plots to show up on the display
-                                         )
