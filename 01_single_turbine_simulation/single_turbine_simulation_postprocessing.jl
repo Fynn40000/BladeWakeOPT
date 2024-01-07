@@ -23,6 +23,15 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     OwnFunctions.postprocess_statistics(save_path, run_name;
                                         rev_to_average_idx=rev_to_average_idx, 
                                         nrevs_to_average=nrevs_to_average)
+
+    # create a folder to save the plots in
+    if isdir(save_path_post)
+      rm(save_path_post, recursive=true)
+      mkdir(save_path_post)
+    else
+      mkdir(save_path_post)
+    end
+    
     # postprocess statistics of the "_vlm" statistics file regarding blade 1
     OwnFunctions.plot_blade_loading(save_path, save_path_post, run_name, R; 
                                     file_marker="_vlm",

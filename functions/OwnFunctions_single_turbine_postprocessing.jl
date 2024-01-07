@@ -42,7 +42,10 @@ Plots the blade loads of a single turbines simulation.
 "
 
 function plot_blade_loading(save_path::String, save_path_post::String, run_name::String, R::Float64; 
-                            file_marker::String="_vlm", rev_to_average_idx=1, nrevs_to_average=1, num_elements::Int64=1, debug::Bool=false)
+                            file_marker::String="_vlm", rev_to_average_idx=1, 
+                            nrevs_to_average=1, 
+                            num_elements::Int64=1, 
+                            debug::Bool=false)
   
   # Plot styles
   stl = "-" # style
@@ -105,78 +108,235 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   end
 
   #--------------------------------------------
+  # Start plotting - Gamma
+  xlabel=L"Radial position $r/R$" 
+  ylabel=L"Circulation $\Gamma$ (m$^2$/s)"
+  linelabel=L"$\Gamma$ distribution"
+  filename="Gamma_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+  plot_var(rs/R, Gamma, xlabel, ylabel, linelabel,save_path_post, filename;
+           xlims=[0,1],
+           dx=0.1
+           )
+
+  #--------------------------------------------
   # Start plotting - Np
-  fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
-  ax = fig.gca()
+  xlabel=L"Radial position $r/R$" 
+  ylabel=L"Loading ($\mathrm{N/m}$)"
+  linelabel=L"$F_{T}$ distribution"
+  filename="Np_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+  plot_var(rs/R, Np, xlabel, ylabel, linelabel,save_path_post, filename;
+           xlims=[0,1],
+           dx=0.1
+           )
+
+  #--------------------------------------------
+  # Start plotting - Tp
+  xlabel=L"Radial position $r/R$" 
+  ylabel=L"Loading ($\mathrm{N/m}$)"
+  linelabel=L"$F_{t}$ distribution"
+  filename="Tp_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+  plot_var(rs/R, Tp, xlabel, ylabel, linelabel,save_path_post, filename;
+           xlims=[0,1],
+           dx=0.1
+           )
+
+  if debug
+
+    #--------------------------------------------
+    # Start plotting - cn
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Thrust coefficient $C_{T}$ (-)"
+    linelabel=L"$C_{T}$ distribution"
+    filename="cn_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, cn, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+    #--------------------------------------------
+    # Start plotting - ct
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Thangential force coefficient $C_{t}$ (-)"
+    linelabel=L"$C_{t}$ distribution"
+    filename="ct_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, ct, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+    #--------------------------------------------
+    # Start plotting - cl
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Lift coefficient $C_{L}$ (-)"
+    linelabel=L"$C_{L}$ distribution"
+    filename="cl_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, cl, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+    #--------------------------------------------
+    # Start plotting - cd
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Drag coefficient $C_{D}$ (-)"
+    linelabel=L"$C_{D}$ distribution"
+    filename="cd_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, cd, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+    #--------------------------------------------
+    # Start plotting - a
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Induction factor $a$ (-)"
+    linelabel=L"$a$ distribution"
+    filename="a_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, a, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+    #--------------------------------------------
+    # Start plotting - a_tangential
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Tangential induction factor $a'$ (-)"
+    linelabel=L"$a'$ distribution"
+    filename="a_tangential_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, a_tangential, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1
+            )
+
+  end
+
+  #--------------------------------------------
+  # Start plotting - Np
+  #fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
+  #ax = fig.gca()
   
   # Plot y=0
-  ax.plot([0, 1], zeros(2), ":k", linewidth=1)
+  #ax.plot([0, 1], zeros(2), ":k", linewidth=1)
 
   # Plot Np
-  ax.plot(rs/R, Np, stl; alpha=alpha, label=lbl*" - Np", color=clr, linewidth=2.0)#"-", "dodgerblue", 1.0, "rVPM - high fidelity"
+  #ax.plot(rs/R, Np, stl; alpha=alpha, label=lbl*" - Np", color=clr, linewidth=2.0)#"-", "dodgerblue", 1.0, "rVPM - high fidelity"
   
   # Format plot
-  xlims, dx = [[0, 1], 0.2]
-  ylims, dy = [[-100, 100], 5]
+  #xlims, dx = [[0, 1], 0.2]
+  #ylims, dy = [[-100, 100], 5]
 
-  ax.set_xlim(xlims)
-  ax.set_xticks(xlims[1]:dx:xlims[2])
-  ax.set_xlabel(L"Radial position $r/R$")
+  #ax.set_xlim(xlims)
+  #ax.set_xticks(xlims[1]:dx:xlims[2])
+  #ax.set_xlabel(L"Radial position $r/R$")
 
-  #ax.set_ylim(ylims)
-  #ax.set_yticks(0:dy:ylims[2])
-  ax.set_ylabel(L"Loading ($\mathrm{N/m}$)")
+  ##ax.set_ylim(ylims)
+  ##ax.set_yticks(0:dy:ylims[2])
+  #ax.set_ylabel(L"Loading ($\mathrm{N/m}$)")
 
-  ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=false, fontsize=10)
+  #ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=false, fontsize=10)
+
+  #ax.spines["right"].set_visible(false)
+  #ax.spines["top"].set_visible(false)
+
+  #fig.tight_layout()
+
+  # Save plot
+  #filename = "Np_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx).pdf"
+  #save_plot(save_path_post, filename; fig=fig)
+
+
+  #--------------------------------------------
+  # Start plotting - Tp
+  #fig2 = plt.figure(figsize=[7*1.5, 5] * 2/3)
+  #ax2 = fig2.gca()
+  
+  # Plot y=0
+  #ax2.plot([0, 1], zeros(2), ":k", linewidth=1)
+
+  # Plot Tp
+  #ax2.plot(rs/R, Tp, stl; alpha=alpha, label=lbl*" - Tp", color=clr, linewidth=2.0)
+
+  # Format plot
+  #xlims, dx = [[0, 1], 0.2]
+  #ylims, dy = [[-100, 100], 5]
+
+  #ax2.set_xlim(xlims)
+  #ax2.set_xticks(xlims[1]:dx:xlims[2])
+  #ax2.set_xlabel(L"Radial position $r/R$")
+
+  ##ax2.set_ylim(ylims)
+  ##ax2.set_yticks(0:dy:ylims[2])
+  #ax2.set_ylabel(L"Loading ($\mathrm{N/m}$)")
+
+  #ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=false, fontsize=10)
+
+  #ax2.spines["right"].set_visible(false)
+  #ax2.spines["top"].set_visible(false)
+
+  #fig2.tight_layout()
+  #typeof(fig2)
+
+  # Save plot
+  #filename = "Tp_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx).pdf"
+  #save_plot(save_path_post, filename; fig=fig2)
+
+end
+
+function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
+                  save_path_post::String, filename::String;
+                  stl::String="-",              # linestyle
+                  alpha::Float64=1.0,           # opacity (1.0 -> solid)
+                  color::String="dodgerblue",   # line color
+                  linewidth::Float64=2.0,       # line thickness
+                  xlims =[0, 0],                # x axis limits => if not set by user, the axis is set automatically
+                  dx=0.1,                       # x axis step => if not set by user, the axis is set automatically
+                  ylims =[0,0],                 # y axis limits => if not set by user, the axis is set automatically
+                  dy=5,                         # y axis step => if not set by user, the axis is set automatically
+                  legend_loc="center left",
+                  legend_bbox_to_anchor=(1, 0.5),
+                  legend_frameon=false,
+                  legend_fontsize=10,
+                  plotYzero::Bool=true,          # plot dashed black line at y=0
+                  filetype::String=".pdf"        # plot file type the plot is saved as
+                  )
+
+  fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
+  ax = fig.gca()
+
+  # Plot y=0
+  if plotYzero
+    ax.plot([0, 1], zeros(2), ":k", linewidth=1)
+  end
+
+  # Plot var
+  ax.plot(x_data, y_data, stl; alpha=alpha, label=linelabel, color=color, linewidth=linewidth)
+  
+  # Set axes
+  if xlims != [0,0]
+    ax.set_xlim(xlims)
+    ax.set_xticks(xlims[1]:dx:xlims[2])
+  end
+  if ylims != [0,0]
+    ax.set_ylim(ylims)
+    ax.set_yticks(ylims[1]:dy:ylims[2])
+  end
+
+  # Set axes labels
+  ax.set_xlabel(xlabel)
+  ax.set_ylabel(ylabel)
+
+  # Set legend
+  ax.legend(loc=legend_loc, bbox_to_anchor=legend_bbox_to_anchor, frameon=legend_frameon, fontsize=legend_fontsize)
 
   ax.spines["right"].set_visible(false)
   ax.spines["top"].set_visible(false)
 
   fig.tight_layout()
 
-  # Save plot
-  filename = "Np_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx).pdf"
-  save_plot(save_path_post, filename; fig=fig)
-
-
-  #--------------------------------------------
-  # Start plotting - Tp
-  fig2 = plt.figure(figsize=[7*1.5, 5] * 2/3)
-  ax2 = fig2.gca()
-  
-  # Plot y=0
-  ax2.plot([0, 1], zeros(2), ":k", linewidth=1)
-
-  # Plot Tp
-  ax2.plot(rs/R, Tp, stl; alpha=alpha, label=lbl*" - Tp", color=clr, linewidth=2.0)
-
-  # Format plot
-  xlims, dx = [[0, 1], 0.2]
-  ylims, dy = [[-100, 100], 5]
-
-  ax2.set_xlim(xlims)
-  ax2.set_xticks(xlims[1]:dx:xlims[2])
-  ax2.set_xlabel(L"Radial position $r/R$")
-
-  #ax2.set_ylim(ylims)
-  #ax2.set_yticks(0:dy:ylims[2])
-  ax2.set_ylabel(L"Loading ($\mathrm{N/m}$)")
-
-  ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=false, fontsize=10)
-
-  ax2.spines["right"].set_visible(false)
-  ax2.spines["top"].set_visible(false)
-
-  fig2.tight_layout()
-  typeof(fig2)
-
-  # Save plot
-  filename = "Tp_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx).pdf"
-  save_plot(save_path_post, filename; fig=fig2)
+  # save the plot
+  fig.savefig(joinpath(save_path_post, filename*filetype))
 
 end
-
-
 
 function save_plot(save_path_post::String, filename::String; fig)
 
