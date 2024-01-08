@@ -10,6 +10,7 @@ Postprocesses the fluiddomain of a single turbines simulation.
 function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                                 save_path::String,                      # path to folder where simulation is stored in
                                 run_name::String,                       # name of simulation
+                                file_suffix::String,                    # postprocessed fluid domain file suffix
                                 R::Float64,                             # Rotor tip radius
                                 AOA::Float64,                           # Angle of attack
                                 nums::Vector{Int64};                    # Time steps to process
@@ -30,7 +31,10 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                                 # ----- OUTPUT OPTIONS ---------------- 
                                 prompt          = true,                 # Whether to prompt the user
                                 verbose         = true,                 # Enable verbose
-                                v_lvl           = 0                     # Verbose indentation level
+                                v_lvl           = 0,                    # Verbose indentation level
+                                debug           = false,                # saves fdom grid as a file
+                                # ----- OTHER ------------------------- 
+                                first_fdom      = true                  # if true, creates folder to store the postprocessed fluiddomains in
                                 )
 
 
@@ -38,7 +42,7 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   staticpfield_prefix = run_name*"_staticpfield"     # Prefix of static particle field files to read
 
   r_path = save_path                        # path to read data from (path to folder all the simulation data is stored in)
-  s_path = joinpath(r_path, run_name*"-fdom")# path to folder all postprocessed fluiddomain files will be stored in
+  s_path = save_path#joinpath(r_path, run_name*"-fdom")# path to folder all postprocessed fluiddomain files will be stored in
 
   output_prefix   = run_name                # Prefix of output files
 
@@ -55,7 +59,7 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
 
   # VPM settings
   maxparticles    = Int(1.0e6 + nnodes)                             # Maximum number of particles
-  fmm             = uns.vpm.FMM(; p=4, ncrit=50, theta=0.4, phi=0.3)    # FMM parameters (decrease phi to reduce FMM noise)
+  fmm             = uns.vpm.FMM(; p=4, ncrit=50, theta=0.4, phi=0.3)# FMM parameters (decrease phi to reduce FMM noise)
   scale_sigma     = 1.00                                            # Shrink smoothing radii by this factor
   f_sigma         = 0.5                                             # Smoothing of node particles as sigma = f_sigma*meansigma
 
@@ -79,12 +83,14 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   end
 
   # Create save path
-  if s_path != r_path
-    uns.gt.create_path(s_path, prompt)
+  if first_fdom
+    if s_path != r_path
+      uns.gt.create_path(s_path, prompt)
+    end
   end
 
   # Copy this driver file
-  cp(@__FILE__, joinpath(s_path, splitdir(@__FILE__)[2]); force=true)
+  #cp(@__FILE__, joinpath(s_path, splitdir(@__FILE__)[2]); force=true)
 
   # Generate function to process the field clipping particle sizes
   preprocessing_pfield = uns.generate_preprocessing_fluiddomain_pfield(maxsigma, maxmagGamma;
@@ -105,11 +111,12 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                            fmm=fmm,
                            f_sigma=f_sigma,
                            save_path=s_path,
-                           file_pref=output_prefix, grid_names=["_fdom"],
+                           file_pref=output_prefix, grid_names=[file_suffix*"_fdom"],
                            other_file_prefs=other_file_prefs,
                            other_read_paths=other_read_paths,
                            userfunction_pfield=preprocessing_pfield,
-                           verbose=verbose, v_lvl=v_lvl)
+                           add_J=true, add_Uinf=true,
+                           verbose=verbose, v_lvl=v_lvl, debug=debug)
 
   end
 

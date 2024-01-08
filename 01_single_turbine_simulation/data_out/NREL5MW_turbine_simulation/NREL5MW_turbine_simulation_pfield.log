@@ -22,25 +22,25 @@
 -------------------------------------------------------------------------
 *************************************************************************
 START /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-07T23:08:11.953
+	2024-01-08T19:05:15.737
 *************************************************************************
 	Time step 0 out of 144	Particles: 0
-	Time step 10 out of 144	Particles: 3194
-	Time step 20 out of 144	Particles: 6707
-	Time step 30 out of 144	Particles: 9897
-	Time step 40 out of 144	Particles: 12957
-	Time step 50 out of 144	Particles: 16018
-	Time step 60 out of 144	Particles: 19078
-	Time step 70 out of 144	Particles: 22138
-	Time step 80 out of 144	Particles: 25198
-	Time step 90 out of 144	Particles: 28258
-	Time step 100 out of 144	Particles: 31318
-	Time step 110 out of 144	Particles: 34378
-	Time step 120 out of 144	Particles: 37438
-	Time step 130 out of 144	Particles: 40498
-	Time step 140 out of 144	Particles: 43558
+	Time step 10 out of 144	Particles: 3201
+	Time step 20 out of 144	Particles: 6736
+	Time step 30 out of 144	Particles: 9935
+	Time step 40 out of 144	Particles: 12995
+	Time step 50 out of 144	Particles: 16058
+	Time step 60 out of 144	Particles: 19118
+	Time step 70 out of 144	Particles: 22178
+	Time step 80 out of 144	Particles: 25238
+	Time step 90 out of 144	Particles: 28298
+	Time step 100 out of 144	Particles: 31358
+	Time step 110 out of 144	Particles: 34418
+	Time step 120 out of 144	Particles: 37478
+	Time step 130 out of 144	Particles: 40538
+	Time step 140 out of 144	Particles: 43598
 *************************************************************************
 END /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-07T23:15:36.420
+	2024-01-08T19:12:28.001
 *************************************************************************
-ELAPSED TIME: 0 hours 7 minutes 24 seconds
+ELAPSED TIME: 0 hours 7 minutes 12 seconds

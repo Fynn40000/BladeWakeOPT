@@ -27,7 +27,7 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
-debug=true
+debug           = true
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
@@ -248,6 +248,7 @@ uns.run_simulation(simulation, nsteps;
                     vlm_vortexsheet = false, # Whether to spread surface circulation as a vortex sheet in the VPM (turns ASM on; ALM if false)
                     vlm_rlx=vlm_rlx, # VLM relaxation (>0.9 can cause divergence, <0.2 slows simulation too much, deactivated with <0)
                     hubtiploss_correction=hubtiploss_correction, # Hub and tip loss correction of rotors (ignored in quasi-steady solver)
+                    wake_coupled = true,          # true => VLM is used; false => BEM is used
                     shed_unsteady=shed_unsteady,
                     shed_starting=shed_starting,
                     extra_runtime_function=monitor_rotor,
@@ -262,17 +263,17 @@ uns.run_simulation(simulation, nsteps;
 
 #Post-process monitor plots
 include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
-                                        # ----- POSTPROCESSING EXECUTION -------------
-                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
-                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
-                                        # ----- SETTINGS FOR POSTPROCESSING -------------
-                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
-                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
-                                         num_elements=n,                        # number of blade elements per blade
-                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
-                                         suppress_plots=true                    # suppresses the plots to show up on the display
-                                         )
+fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
+                                                         # ----- POSTPROCESSING EXECUTION -------------
+                                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
+                                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
+                                                         # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
+                                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
+                                                         num_elements=n,                        # number of blade elements per blade
+                                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
+                                                         suppress_plots=true                    # suppresses the plots to show up on the display
+                                                         )
 
 # ----------------- 7) VISUALIZATION -------------------------------------------
 if paraview
@@ -287,7 +288,10 @@ if paraview
     end
 
     if postprocess_fdom
-        files *= joinpath(save_path, run_name*"-fdom", run_name*"_fdom...xmf;")
+        for suffix in fdom_suffixes
+            global files
+            files *= run_name*suffix
+        end
     end
 
     # Call Paraview
