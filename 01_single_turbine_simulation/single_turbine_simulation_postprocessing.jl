@@ -91,7 +91,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     y_b_min = -0.7
     z_b_min = (-(vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
     # grid maximum boundaries (bound_factor*2*R in meters)
-    x_b_max = 8
+    x_b_max = 15
     y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 
@@ -118,7 +118,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
 
     # --------------- postprocess y-z-plane -------------------
 
-    for x in 1:2:10 # x represents the stations a y-z-plane will be added
+    for x in 1:1:15 # x represents the stations a y-z-plane will be added
       x_loc = x   # x coordinate location of plane = x_loc*2*R in meters
       file_suffix = "_y_z_atx$(x_loc)D"
       push!(file_suffixes, file_suffix)

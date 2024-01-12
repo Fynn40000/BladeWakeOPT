@@ -82,7 +82,7 @@ rho             = 1.225                     # (kg/m^3) air density
 mu              = 1.81e-5                   # (kg/ms) air dynamic viscosity
 speedofsound    = 342.35                    # (m/s) speed of sound
 
-magVinf         = J*RPM/60*(2*R)#11.4
+magVinf         = J*RPM/60*(2*R)
 magVinfx        = magVinf*cosd(AOA)         # wind velocity in x direction
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0] # (m/s) freestream velocity vector
 
