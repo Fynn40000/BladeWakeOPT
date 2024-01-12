@@ -12,11 +12,15 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
                                                   plot_bladeloads::Bool=true,     # postprocessing the bladeloads?
                                                   postprocess_fdom::Bool=true,    # postprocessing the fluiddomain?
                                                   # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                  Vinf = (X, t)->zeros(3),        # Freestream Velocity
                                                   rev_to_average_idx=1,           # Revolution to wich the postprocessing should be applied on
                                                   nrevs_to_average=1,             # number of Revolutions to average for postprocessing the bladeloads
                                                   num_elements::Int64=1,          # number of blade elements per blade
+                                                  tsteps = [1],                   # time steps to be postprocessed
                                                   debug::Bool=false,              # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
-                                                  suppress_plots::Bool=true       # suppresses the plots to show up on the display
+                                                  suppress_plots::Bool=true,      # suppresses the plots to show up on the display
+                                                  gridsize_x_y::Float64=0.5,      # grid size of x-y fluid domain plane in meters
+                                                  gridsize_y_z::Float64=0.5,      # grid size of y-z fluid domain plane in meters
                                                   )
 
   println("\nPostprocessing...\n")
@@ -66,7 +70,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     # Calculate nsteps_per_rev
     #nsteps_per_rev[run_name] = ceil(Int, 360 / (simdata[2, 1] - simdata[1, 1]))
 
-    timesteps_to_evaluate = [140]
+    timesteps_to_evaluate = tsteps
 
 
 
@@ -75,22 +79,25 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     z_loc = 0   # z coordinate location of plane = z_loc*2*R in meters
     file_suffix = "_x_y_atz$(z_loc)D"
     push!(file_suffixes, file_suffix)
-    vol_thickness = 0 # plane thickness in meters => set this value to 0 to get a 2D solution (plane)
+    vol_thickness = 0                         # plane thickness in meters => set this value to 0 to get a 2D solution (plane)
+    gridsize_m = gridsize_x_y                 # grid size in meters => 0.5 equals 0.5m
 
     # grid resolution
-    x_res = 100
-    y_res = 100
+    x_res = R*(1/gridsize_m)
+    y_res = R*(1/gridsize_m)
     z_res = 1
     # grid minimum boundaries (bound_factor*2*R in meters)
     x_b_min = -0.2
-    y_b_min = -0.6
+    y_b_min = -0.7
     z_b_min = (-(vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
     # grid maximum boundaries (bound_factor*2*R in meters)
-    x_b_max = 10
-    y_b_max = 0.6
+    x_b_max = 8
+    y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 
     OwnFunctions.postprocess_fluiddomain(save_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
+                                         # ----- FREESTREAM VELOCITY ---------
+                                         Vinf            = Vinf,
                                          # ----- GRID OPTIONS ----------------  
                                          x_resolution    = x_res,                   # discretization of grid in x-direction
                                          y_resolution    = y_res,                   # discretization of grid in y-direction
@@ -108,29 +115,34 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
                                          )
 
 
-                                         
+
     # --------------- postprocess y-z-plane -------------------
 
     for x in 1:2:10 # x represents the stations a y-z-plane will be added
       x_loc = x   # x coordinate location of plane = x_loc*2*R in meters
       file_suffix = "_y_z_atx$(x_loc)D"
       push!(file_suffixes, file_suffix)
-      vol_thickness = 0 # plane thickness in meters => set this value to 0 to get a 2D solution (plane)
+      vol_thickness = 0                         # plane thickness in meters => set this value to 0 to get a 2D solution (plane)
+      gridsize_m = gridsize_y_z                 # grid size in meters => 0.5 equals 0.5m
 
       # grid resolution
       x_res = 1
-      y_res = 100
-      z_res = 100
+      y_res = R*(1/gridsize_m)
+      z_res = R*(1/gridsize_m)
       # grid minimum boundaries (bound_factor*2*R in meters)
       x_b_min = (-(vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
-      y_b_min = -0.6
-      z_b_min = -0.6
+      y_b_min = -0.7
+      z_b_min = -0.7
       # grid maximum boundaries (bound_factor*2*R in meters)
       x_b_max = ((vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
-      y_b_max = 0.6
-      z_b_max = 0.6
+      y_b_max = 0.7
+      z_b_max = 0.7
+
+
 
       OwnFunctions.postprocess_fluiddomain(save_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
+                                          # ----- FREESTREAM VELOCITY ---------
+                                          Vinf            = Vinf,
                                           # ----- GRID OPTIONS ----------------  
                                           x_resolution    = x_res,                   # discretization of grid in x-direction
                                           y_resolution    = y_res,                   # discretization of grid in y-direction

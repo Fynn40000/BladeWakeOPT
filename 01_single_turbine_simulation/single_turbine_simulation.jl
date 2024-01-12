@@ -23,11 +23,17 @@ run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
 save_path       = joinpath(start_simulation_path, "data_out", run_name) # Where to save this simulation #splitdir(@__FILE__)[1] * "/data_out" * "/" * run_name                 
 save_path_post  = joinpath(save_path, "postprocessing") # Where to save postprocessing plots
 
+# ----------------- Fidelity Options --------------------------------------------------------
+
+fidelity        = "low"                     # options: "low", "mid", "high"
+run_length      = 36                        # number of revolutions to run => defines the length of the simulation
+
 # ----------------- Postprocessing and Visualization ----------------------------------------
 paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
-debug           = true
+debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
+show_bladeload_plots = true                 # show the bladeload plots on display after postprocessing?
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
@@ -48,8 +54,14 @@ turbine_flag    = true                                                      # Th
 #       `xfoil=false` and pointing to polar files through `rotor_file`.
 
 # Discretization
-n               = 50                        # Number of blade elements per blade
-r               = 1/10                       # Geometric expansion of elements
+if fidelity == "low"
+    n               = 20                         # Number of blade elements per blade
+elseif fidelity == "mid"
+    n               = 50                                                
+elseif fidelity == "high"
+    n               = 50                         
+end
+r               = 1/10                       # Geometric expansion of elements               
 
 # NOTE: Here a geometric expansion of 1/5 means that the spacing between the
 #       tip elements is 1/5 of the spacing between the hub elements. Refine the
@@ -63,14 +75,14 @@ R, B            = uns.read_rotor(rotor_file; data_path=data_path)[[1,3]]
 
 # Operating conditions
 RPM             = 12.1                      # RPM
-J               = 11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
+J               = 11.4/((RPM/60)*2*R)#0       # Advance ratio Vinf/(nD)
 AOA             = 0.0                       # (deg) Angle of attack (incidence angle)
 
 rho             = 1.225                     # (kg/m^3) air density
 mu              = 1.81e-5                   # (kg/ms) air dynamic viscosity
 speedofsound    = 342.35                    # (m/s) speed of sound
 
-magVinf         = J*RPM/60*(2*R)
+magVinf         = J*RPM/60*(2*R)#11.4
 magVinfx        = magVinf*cosd(AOA)         # wind velocity in x direction
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0] # (m/s) freestream velocity vector
 
@@ -91,30 +103,81 @@ println("""
 VehicleType     = uns.UVLMVehicle           # Unsteady solver
 # VehicleType   = uns.QVLMVehicle           # Quasi-steady solver => for low fidelity simulation (uses blade-element momentum theory?!?!)
 const_solution  = VehicleType==uns.QVLMVehicle  # Whether to assume that the
-                                                # solution is constant or not
+                                                #  solution is constant or not
 # Time parameters
-nrevs           = 4                         # Number of revolutions in simulation
-nsteps_per_rev  = 36                        # Time steps per revolution
+nrevs           = run_length                # Number of revolutions in simulation
+
+if fidelity == "low"
+    nsteps_per_rev  = 36                    # Time steps per revolution
+elseif fidelity == "mid"
+    nsteps_per_rev  = 72
+elseif fidelity == "high"
+    nsteps_per_rev  = 360
+end
+
 nsteps          = const_solution ? 2 : nrevs*nsteps_per_rev # Number of time steps
 ttot            = nsteps/nsteps_per_rev / (RPM/60)       # (s) total simulation time
 
 # VPM particle shedding
-p_per_step      = 2                         # Sheds per time step
-shed_starting   = true                      # Whether to shed starting vortex
-shed_unsteady   = true                      # Whether to shed vorticity from unsteady loading
+if fidelity == "low"
+    p_per_step      = 4                      # Sheds per time step
+    shed_starting   = false                  # Whether to shed starting vortex
+elseif fidelity == "mid"
+    p_per_step      = 2
+    shed_starting   = false
+elseif fidelity == "high"
+    p_per_step      = 2
+    shed_starting   = true
+end
+
+shed_unsteady   = true                        # Whether to shed vorticity from unsteady loading
 max_particles   = ((2*n+1)*B)*nsteps*p_per_step + 1 # Maximum number of particles
 
 # Regularization
-sigma_rotor_surf= R/40                      # Rotor-on-VPM smoothing radius
+if fidelity == "low"
+    sigma_rotor_surf= R/10                      # Rotor-on-VPM smoothing radius
+    sigmafactor_vpmonvlm= 1                     # Shrink particles by this factor when
+                                                #  calculating VPM-on-VLM/Rotor induced velocities
+elseif fidelity == "mid"
+    sigma_rotor_surf= R/10
+    sigmafactor_vpmonvlm= 1                                   
+elseif fidelity == "high"
+    sigma_rotor_surf= R/80
+    sigmafactor_vpmonvlm= 5.5                   
+end
+
 lambda_vpm      = 2.125                     # VPM core overlap
                                             # VPM smoothing radius
 sigma_vpm_overwrite = lambda_vpm * 2*pi*R/(nsteps_per_rev*p_per_step)
 
 # Rotor solver
-vlm_rlx         = 0.7                       # VLM relaxation <-- this also applied to rotors
-hubtiploss_correction = vlm.hubtiploss_nocorrection # Hub and tip loss correction (options: vlm.hubtiploss_nocorrection, )
+vlm_rlx         = 0.5                       # VLM relaxation <-- this also applied to rotors
+hubtiploss_correction = vlm.hubtiploss_correction_prandtl#vlm.hubtiploss_nocorrection# Hub and tip loss correction (options: vlm.hubtiploss_nocorrection, 
+                                                                                           #vlm.hubtiploss_correction_prandtl
+                                                                                           #vlm.hubtiploss_correction_modprandtl)
 
 # VPM solver
+if fidelity == "low"
+    vpm_integration = vpm.euler                 # VPM temporal integration scheme (=> vpm.rungekutta3 = default)
+    vpm_SFS         = vpm.SFS_none              # VPM LES subfilter-scale model
+elseif fidelity == "mid"
+    vpm_integration = vpm.rungekutta3  
+    vpm_SFS         = vpm.SFS_none
+elseif fidelity == "high"
+    vpm_integration = vpm.rungekutta3
+    vpm_SFS = vpm.SFS_Cd_twolevel_nobackscatter
+end
+# vpm_SFS       = vpm.SFS_Cd_twolevel_nobackscatter
+# vpm_SFS       = vpm.SFS_Cd_threelevel_nobackscatter
+# vpm_SFS       = vpm.DynamicSFS(vpm.Estr_fmm, vpm.pseudo3level_positive;
+#                                   alpha=0.999, maxC=1.0,
+#                                   clippings=[vpm.clipping_backscatter])
+# vpm_SFS       = vpm.DynamicSFS(vpm.Estr_fmm, vpm.pseudo3level_positive;
+#                                   alpha=0.999, rlxf=0.005, minC=0, maxC=1
+#                                   clippings=[vpm.clipping_backscatter],
+#                                   controls=[vpm.control_sigmasensor],
+#                                   )
+
 vpm_viscous     = vpm.Inviscid()            # VPM viscous diffusion scheme
 
 # NOTE: In most practical situations, open rotors operate at a Reynolds number
@@ -131,13 +194,72 @@ if VehicleType == uns.QVLMVehicle
     uns.vlm.VLMSolver._mute_warning(true)
 end
 
+
+# ----------------- WAKE TREATMENT ---------------------------------------------
+# NOTE: It is known in the CFD community that rotor simulations with an
+#       impulsive RPM start (*i.e.*, 0 to RPM in the first time step, as opposed
+#       to gradually ramping up the RPM) leads to the hub "fountain effect",
+#       with the root wake reversing the flow near the hub.
+#       The fountain eventually goes away as the wake develops, but this happens
+#       very slowly, which delays the convergence of the simulation to a steady
+#       state. To accelerate convergence, here we define a wake treatment
+#       procedure that suppresses the hub wake for the first three revolutions,
+#       avoiding the fountain effect altogether.
+#       This is especially helpful in low and mid-fidelity simulations.
+
+if fidelity == "low"
+    suppress_fountain   = true                  # Toggle
+elseif fidelity == "mid"
+    suppress_fountain   = true
+elseif fidelity == "high"
+    suppress_fountain   = false
+end
+
+# Supress wake shedding on blade elements inboard of this r/R radial station
+no_shedding_Rthreshold = suppress_fountain ? 0.35 : 0.0
+
+
+# Supress wake shedding for this many time steps
+no_shedding_nstepsthreshold = 3*nsteps_per_rev
+
+omit_shedding = []          # Index of blade elements to supress wake shedding
+
+# Function to suppress or activate wake shedding
+function wake_treatment_supress(sim, args...; optargs...)
+
+    # Case: start of simulation -> suppress shedding
+    if sim.nt == 1
+
+        # Identify blade elements on which to suppress shedding
+        for i in 1:vlm.get_m(rotor)
+            HS = vlm.getHorseshoe(rotor, i)
+            CP = HS[5]
+
+            if uns.vlm.norm(CP - vlm._get_O(rotor)) <= no_shedding_Rthreshold*R
+                push!(omit_shedding, i)
+            end
+        end
+    end
+
+    # Case: sufficient time steps -> enable shedding
+    if sim.nt == no_shedding_nstepsthreshold
+
+        # Flag to stop suppressing
+        omit_shedding .= -1
+
+    end
+
+    return false
+end
+
+
 # ----------------- 1) VEHICLE DEFINITION --------------------------------------
 println("Generating geometry...")
 
 # Generate rotor
 rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         n=n, CW=CW, blade_r=r,
-                                        altReD=[RPM, J, mu/rho],#!!!!
+                                        altReD=[RPM, J, mu/rho],
                                         xfoil=xfoil,
                                         ncrit=ncrit,
                                         turbine_flag=turbine_flag,
@@ -234,6 +356,9 @@ monitor_rotor = uns.generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVi
 # ------------- 5) RUN SIMULATION ----------------------------------------------
 println("Running simulation...")
 
+# Concatenate monitors and wake treatment procedure into one runtime function
+runtime_function = uns.concatenate(monitor_rotor, wake_treatment_supress)
+
 uns.run_simulation(simulation, nsteps;
                     # ----- SIMULATION OPTIONS -------------
                     Vinf=Vinf,
@@ -251,7 +376,7 @@ uns.run_simulation(simulation, nsteps;
                     wake_coupled = true,          # true => VLM is used; false => BEM is used
                     shed_unsteady=shed_unsteady,
                     shed_starting=shed_starting,
-                    extra_runtime_function=monitor_rotor,
+                    extra_runtime_function=runtime_function,#monitor_rotor,
                     # ----- OUTPUT OPTIONS ------------------
                     save_path=save_path,
                     run_name=run_name,
@@ -268,11 +393,15 @@ fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_po
                                                          plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
                                                          postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                                          # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                         Vinf = Vinf,        # Freestream Velocity
                                                          rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
                                                          nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
                                                          num_elements=n,                        # number of blade elements per blade
+                                                         tsteps = [nsteps-1],                          # time steps to be postprocessed
                                                          debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
-                                                         suppress_plots=true                    # suppresses the plots to show up on the display
+                                                         suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
+                                                         gridsize_x_y=0.5,                      # grid size of x-y fluid domain plane in meters
+                                                         gridsize_y_z=0.5                       # grid size of y-z fluid domain plane in meters
                                                          )
 
 # ----------------- 7) VISUALIZATION -------------------------------------------

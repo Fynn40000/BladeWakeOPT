@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------
 
 	SOLVER SETTINGS
-		  maxparticles----> 87265
+		  maxparticles----> 106273
 		   formulation----> formulation_rVPM
 		       viscous----> (Symbol("*userfunction"), "FLOWVPM.Inviscid{Float64}(0.0)")
 		        kernel----> gaussianerf
@@ -22,25 +22,32 @@
 -------------------------------------------------------------------------
 *************************************************************************
 START /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-08T19:05:15.737
+	2024-01-12T15:17:40.126
 *************************************************************************
-	Time step 0 out of 144	Particles: 0
-	Time step 10 out of 144	Particles: 3201
-	Time step 20 out of 144	Particles: 6736
-	Time step 30 out of 144	Particles: 9935
-	Time step 40 out of 144	Particles: 12995
-	Time step 50 out of 144	Particles: 16058
-	Time step 60 out of 144	Particles: 19118
-	Time step 70 out of 144	Particles: 22178
-	Time step 80 out of 144	Particles: 25238
-	Time step 90 out of 144	Particles: 28298
-	Time step 100 out of 144	Particles: 31358
-	Time step 110 out of 144	Particles: 34418
-	Time step 120 out of 144	Particles: 37478
-	Time step 130 out of 144	Particles: 40538
-	Time step 140 out of 144	Particles: 43598
+	Time step 0 out of 216	Particles: 0
+	Time step 10 out of 216	Particles: 2289
+	Time step 20 out of 216	Particles: 4809
+	Time step 30 out of 216	Particles: 7331
+	Time step 40 out of 216	Particles: 9851
+	Time step 50 out of 216	Particles: 12373
+	Time step 60 out of 216	Particles: 14893
+	Time step 70 out of 216	Particles: 17413
+	Time step 80 out of 216	Particles: 19933
+	Time step 90 out of 216	Particles: 22453
+	Time step 100 out of 216	Particles: 24973
+	Time step 110 out of 216	Particles: 27493
+	Time step 120 out of 216	Particles: 30013
+	Time step 130 out of 216	Particles: 32533
+	Time step 140 out of 216	Particles: 35053
+	Time step 150 out of 216	Particles: 37573
+	Time step 160 out of 216	Particles: 40093
+	Time step 170 out of 216	Particles: 42613
+	Time step 180 out of 216	Particles: 45133
+	Time step 190 out of 216	Particles: 47653
+	Time step 200 out of 216	Particles: 50173
+	Time step 210 out of 216	Particles: 52693
 *************************************************************************
 END /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
-	2024-01-08T19:12:28.001
+	2024-01-12T15:30:21.477
 *************************************************************************
-ELAPSED TIME: 0 hours 7 minutes 12 seconds
+ELAPSED TIME: 0 hours 12 minutes 41 seconds

@@ -72,7 +72,8 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   elseif file_marker == "_loft"
     (roR, Gamma, Np, Tp, 
      cn, ct, cl, cd,
-     a, a_tangential) = uns.postprocess_bladeloading_turbine(r_path;
+     a, a_tangential, 
+     aoa, L, D) =        uns.postprocess_bladeloading_turbine(r_path;
                                                               O           = zeros(3),
                                                               rotor_axis  = rotor_axis,
                                                               filename    = run_name*"_Rotor_Blade1"*file_marker*"-statistics.vtk",
@@ -189,6 +190,42 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     linelabel=L"$a'$ distribution"
     filename="a_tangential_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, a_tangential, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+    
+    #--------------------------------------------
+    # Start plotting - aoa
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"angle of attack $\alpha$ (°))"
+    linelabel=L"$\alpha$ distribution"
+    filename="aoa_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, aoa, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - L
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Lift $F_{L}$ ($\mathrm{N/m}$))"
+    linelabel=L"$F_{L}$ distribution"
+    filename="L_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, L, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - D
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Drag $F_{D}$ ($\mathrm{N/m}$))"
+    linelabel=L"$F_{D}$ distribution"
+    filename="D_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, D, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
             dx=0.1,
             suppress_plots=suppress_plots

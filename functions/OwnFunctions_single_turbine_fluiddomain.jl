@@ -14,6 +14,8 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                                 R::Float64,                             # Rotor tip radius
                                 AOA::Float64,                           # Angle of attack
                                 nums::Vector{Int64};                    # Time steps to process
+                                # ----- FREESTREAM VELOCITY ---------
+                                Vinf            = (X, t)->zeros(3),
                                 # ----- GRID OPTIONS ----------------  
                                 x_resolution    = 50,                   # discretization of grid in x-direction
                                 y_resolution    = 50,                   # discretization of grid in y-direction
@@ -104,11 +106,14 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   threaded_nums = [view(nums, dnum*i+1:(i<nthreads-1 ? dnum*(i+1) : length(nums))) for i in 0:nthreads-1]
 
   for these_nums in threaded_nums[nthread:nthread]
+    Xdummy = zeros(3)
+    U = t->Vinf(Xdummy, t)
     uns.computefluiddomain(Pmin, Pmax, NDIVS,
                            maxparticles,
                            these_nums, r_path, pfield_prefix;
                            Oaxis=Oaxis,
                            fmm=fmm,
+                           pfield_optargs=[:Uinf => U],
                            f_sigma=f_sigma,
                            save_path=s_path,
                            file_pref=output_prefix, grid_names=[file_suffix*"_fdom"],

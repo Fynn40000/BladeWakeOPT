@@ -86,7 +86,10 @@ function postprocess_bladeloading_turbine(read_path;
         cl = data["POINT_DATA"]["cl"*fieldsuff][1:end] # Lift coefficient
         cd = data["POINT_DATA"]["cd"*fieldsuff][1:end] # Drag coefficient
         
-        
+        aoa = data["POINT_DATA"]["ThetaEffDeg"*fieldsuff][1:end] # effective angle of attack
+        L = data["POINT_DATA"]["Lift"*fieldsuff][1:end] # Lift
+        D = data["POINT_DATA"]["Drag"*fieldsuff][1:end] # Drag
+
         # Clear the arrays up...
         roR = _clear_arr(roR, num_elements)
         Gamma = _clear_arr(Gamma, num_elements)
@@ -98,6 +101,10 @@ function postprocess_bladeloading_turbine(read_path;
             ct = _clear_arr(ct, num_elements)
             cl = _clear_arr(cl, num_elements)
             cd = _clear_arr(cd, num_elements)
+
+            aoa = _clear_arr(aoa, num_elements)
+            L = _clear_arr(L, num_elements)
+            D = _clear_arr(D, num_elements)
 
             # Calculate induction factor distribution based on thrust coeff distribution
             a = (1 .- sqrt.(1 .- cn)) ./ 2
@@ -112,10 +119,9 @@ function postprocess_bladeloading_turbine(read_path;
             a_tangential = nothing
         end
 
-        return roR, Gamma, Np, Tp, cn, ct, cl, cd, a, a_tangential, _Ftot_axis
+        return roR, Gamma, Np, Tp, cn, ct, cl, cd, a, a_tangential, aoa, L, D, _Ftot_axis
     end
 
-    
 end
 
 function _clear_arr(arr::Vector{Float64}, num_elements::Int64=1)
