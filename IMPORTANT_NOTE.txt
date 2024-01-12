@@ -1,0 +1,27 @@
+IMPORTANT:
+=> change in file "src/FLOWVLM_rotor.jl" within the FLOWVLM Repository (installed within julia packages folder) following codelines:
+
+
+
+=> within function (line 2028):
+function _calc_distributedloads_lookuptable(ccbrotor::OCCBRotor,
+                                            ccbinflow::OCCBInflow,
+                                            turbine_flag::Bool;
+                                            hubtiploss_correction=hubtiploss_nocorrection)
+
+=> line to change (line 2064 and 2065):
+	# airfoil cl/cd
+    	cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], thetaeff)
+
+	=> change to:
+		# airfoil cl/cd
+    		cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], -1*swapsign*thetaeff)
+    		cl[i] = -1*swapsign*cl[i] 
+
+
+
+??? WHY ???
+=> If the turbine_flag argument is set to true, FLOWUnsteady negates the twist angles.
+   The old codeline uses the negated twist angles to get the cl and cd values via the ploars (lookuptable).
+   It is necessary to perform the table lookup with the positive twist angle, since in most cases the airfoil profiles are not symmetric and 
+   the airfoil polars are not symmetrical to the y-axis to get the true cl and cd values.
