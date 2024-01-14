@@ -26,7 +26,7 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 8#36                        # number of revolutions to run => defines the length of the simulation
+run_length      = 2#36                        # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 paraview        = true                      # Whether to visualize with Paraview
@@ -401,14 +401,16 @@ fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_po
                                                          postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                                          # ----- SETTINGS FOR POSTPROCESSING -------------
                                                          Vinf = Vinf,                           # Freestream Velocity
+                                                         magVinfx = magVinfx,                   # Freestream Velocity in x direction
+                                                         sim_time = ttot,                       # Overall (real) simulation time in seconds
                                                          rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
                                                          nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
                                                          num_elements=n,                        # number of blade elements per blade
                                                          tsteps = [nsteps-1],                   # time steps to be postprocessed
                                                          debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
                                                          suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
-                                                         gridsize_x_y=0.25,                      # grid size of x-y fluid domain plane in meters
-                                                         gridsize_y_z=0.25                       # grid size of y-z fluid domain plane in meters
+                                                         gridsize_x_y=0.25,                     # grid size of x-y fluid domain plane in meters
+                                                         gridsize_y_z=0.25                      # grid size of y-z fluid domain plane in meters
                                                          )
 
 # ----------------- 7) VISUALIZATION -------------------------------------------

@@ -1,4 +1,9 @@
 IMPORTANT:
+Alternatively to the following options, simply overwrite the "src/FLOWVLM_rotor.jl" file within the FLOWVLM Repository under the Julia packages
+with all functions given in file "functions/OwnFunctions_FLOWVLM_rotor.jl" within the BladeWakeOPT Repository (this Repository)
+=> note: the magVinfx variable must be changed to the conditions to be simulated
+
+-------------------------- 1 --------------------------
 => change in file "src/FLOWVLM_rotor.jl" within the FLOWVLM Repository (installed within julia packages folder) following codelines:
 
 
@@ -10,13 +15,17 @@ function _calc_distributedloads_lookuptable(ccbrotor::OCCBRotor,
                                             hubtiploss_correction=hubtiploss_nocorrection)
 
 => line to change (line 2064 and 2065):
+	=>
 	# airfoil cl/cd
     	cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], thetaeff)
+	<=
 
 	=> change to:
+		=>
 		# airfoil cl/cd
     		cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], -1*swapsign*thetaeff)
-    		cl[i] = -1*swapsign*cl[i] 
+    		cl[i] = -1*swapsign*cl[i]
+		<=
 
 
 
@@ -25,3 +34,17 @@ function _calc_distributedloads_lookuptable(ccbrotor::OCCBRotor,
    The old codeline uses the negated twist angles to get the cl and cd values via the ploars (lookuptable).
    It is necessary to perform the table lookup with the positive twist angle, since in most cases the airfoil profiles are not symmetric and 
    the airfoil polars are not symmetrical to the y-axis to get the true cl and cd values.
+
+
+-------------------------- 2 --------------------------
+=> add in the same function _calc_distributedloads_lookuptable the following code snippet, if you want to calculate the thrust coefficient (cn) and tangential force coefficient (ct) as they are used in the wind turbine convention.
+	
+    =>
+    # If a turbine is calculated then return the cn and ct coefficients normed by the freestream velocity in x direction
+    if turbine_flag
+      magVinfx = 11.4							# ENTER THE FREESTREAM VELOCITY HERE
+      aux2 = 0.5*ccbinflow.rho*(magVinfx*magVinfx)*ccbrotor.r[i] 	# Wind turbine norm factor
+      cn[i] = Np[i] / aux2
+      ct[i] = Tp[i] / aux2
+    end
+    <=

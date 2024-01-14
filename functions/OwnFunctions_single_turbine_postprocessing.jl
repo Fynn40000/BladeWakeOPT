@@ -9,7 +9,6 @@
 "
 Applies function uns.postprocess_statistics
 "
-
 function postprocess_statistics(save_path::String, run_name::String;
                                 rev_to_average_idx=1, nrevs_to_average=1)
 
@@ -41,7 +40,6 @@ end
 "
 Plots the blade loads of a single turbines simulation.
 "
-
 function plot_blade_loading(save_path::String, save_path_post::String, run_name::String, R::Float64; 
                             file_marker::String="_vlm", rev_to_average_idx=1, 
                             nrevs_to_average=1, 
@@ -70,10 +68,11 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
                                                                 num_elements= num_elements
                                                                 )
   elseif file_marker == "_loft"
-    (roR, Gamma, Np, Tp, 
+    (roR, Gamma, Np, Tp, L, D,
      cn, ct, cl, cd,
      a, a_tangential, 
-     aoa, L, D) =        uns.postprocess_bladeloading_turbine(r_path;
+     aoa, twist, flowangle, 
+     Vx, Vy, w) =        uns.postprocess_bladeloading_turbine(r_path;
                                                               O           = zeros(3),
                                                               rotor_axis  = rotor_axis,
                                                               filename    = run_name*"_Rotor_Blade1"*file_marker*"-statistics.vtk",
@@ -122,6 +121,30 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
            )
 
   if debug
+
+    #--------------------------------------------
+    # Start plotting - L
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Lift $F_{L}$ ($\mathrm{N/m}$))"
+    linelabel=L"$F_{L}$ distribution"
+    filename="L_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, L, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - D
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Drag $F_{D}$ ($\mathrm{N/m}$))"
+    linelabel=L"$F_{D}$ distribution"
+    filename="D_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, D, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
 
     #--------------------------------------------
     # Start plotting - cn
@@ -198,7 +221,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     #--------------------------------------------
     # Start plotting - aoa
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"angle of attack $\alpha$ (°))"
+    ylabel=L"angle of attack $\alpha$ (°)"
     linelabel=L"$\alpha$ distribution"
     filename="aoa_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, aoa, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -208,24 +231,60 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
             )
 
     #--------------------------------------------
-    # Start plotting - L
+    # Start plotting - twist
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Lift $F_{L}$ ($\mathrm{N/m}$))"
-    linelabel=L"$F_{L}$ distribution"
-    filename="L_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
-    plot_var(rs/R, L, xlabel, ylabel, linelabel,save_path_post, filename;
+    ylabel=L"twist angle $\Theta$ (°)"
+    linelabel=L"$\Theta$ distribution"
+    filename="twist_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, twist, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
             dx=0.1,
             suppress_plots=suppress_plots
             )
 
     #--------------------------------------------
-    # Start plotting - D
+    # Start plotting - flowangle
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Drag $F_{D}$ ($\mathrm{N/m}$))"
-    linelabel=L"$F_{D}$ distribution"
-    filename="D_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
-    plot_var(rs/R, D, xlabel, ylabel, linelabel,save_path_post, filename;
+    ylabel=L"flow angle $\beta$ (°)"
+    linelabel=L"$\beta$ distribution"
+    filename="flowangle_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, flowangle, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - Vx
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"local flow velocity x-direction $V_{x}$ ($\mathrm{m/s}$)"
+    linelabel=L"$V_{x}$ distribution"
+    filename="Vx_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, Vx, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - Vy
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"local flow velocity y-direction $V_{y}$ ($\mathrm{m/s}$)"
+    linelabel=L"$V_{y}$ distribution"
+    filename="Vy_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, Vy, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - w
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"local relative flow velocity $w$ ($\mathrm{m/s}$)"
+    linelabel=L"$w$ distribution"
+    filename="w_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, w, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
             dx=0.1,
             suppress_plots=suppress_plots
@@ -235,6 +294,10 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
 
 end
 
+
+"
+Creates and saves a plot of a given x and y data row.
+"
 function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
                   save_path_post::String, filename::String;
                   stl::String="-",              # linestyle
@@ -249,9 +312,12 @@ function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
                   legend_bbox_to_anchor=(1, 0.5),
                   legend_frameon=false,
                   legend_fontsize=10,
-                  plotYzero::Bool=true,          # plot dashed black line at y=0
-                  filetype::String=".pdf",       # plot file type the plot is saved as
-                  suppress_plots::Bool=true      # suppresses the plots to show up on the display
+                  plotYzero::Bool=true,         # plot dashed black line at y=0
+                  filetype::String=".pdf",      # plot file type the plot is saved as
+                  x_name::String="x_data",      # name of the x data
+                  y_name::String="y_data",      # name of the y data
+                  suppress_plots::Bool=true,    # suppresses the plots to show up on the display
+                  save_csv::Bool=true           # if true, a .csv file will be created containing the x-axis and y-axis values
                   )
 
   fig = plt.figure(figsize=[7*1.5, 5] * 2/3)
@@ -292,5 +358,32 @@ function plot_var(x_data, y_data, xlabel, ylabel, linelabel,
   if suppress_plots
     close(fig)
   end
+
+  if save_csv
+    _create_csv(x_data, y_data, save_path_post, filename;
+                x_name=x_name,
+                y_name=y_name
+                )
+  end
+
+end
+
+"
+Creates and saves a csv file of a given x and y data row.
+"
+function _create_csv(x_data, y_data, save_path_post::String, filename::String;
+                     x_name::String="x_data",      # name of the x data
+                     y_name::String="y_data",      # name of the y data
+                     )
+
+  fname = joinpath(save_path_post, filename*".csv")             # file path to store data in
+
+  #f = open(fname, "w")
+
+  data_matrix = hcat(x_data, y_data)                            # matrix with all data
+  #data_table = Tables.table(data_matrix)                        # matrix converted into table
+  df = DataFrame(data_matrix, :auto)                            # matrix converted into dataframe
+
+  CSV.write(fname, df, header=[x_name, y_name])                 # Create and save csv file
 
 end

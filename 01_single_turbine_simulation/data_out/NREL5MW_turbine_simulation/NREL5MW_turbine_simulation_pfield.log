@@ -1,0 +1,39 @@
+-------------------------------------------------------------------------
+
+	SOLVER SETTINGS
+		  maxparticles----> 35425
+		   formulation----> formulation_rVPM
+		       viscous----> (Symbol("*userfunction"), "FLOWVPM.Inviscid{Float64}(0.0)")
+		        kernel----> gaussianerf
+		            UJ----> UJ_fmm
+		          Uinf----> (Symbol("*userfunction"), "#147")
+		           SFS----> SFS_none
+		   integration----> euler
+		    transposed----> true
+		    relaxation----> pedrizzetti
+		           fmm----> FLOWVPM.FMM(4, 50, 0.4, 0.5)
+
+	SIMULATION SETTINGS
+		dt:			0.13774104683195593
+		Runtime function:	Yes
+		Static particles:	Yes
+		nsteps_save:		1
+
+-------------------------------------------------------------------------
+*************************************************************************
+START /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
+	2024-01-14T22:08:45.331
+*************************************************************************
+	Time step 0 out of 72	Particles: 0
+	Time step 10 out of 72	Particles: 2162
+	Time step 20 out of 72	Particles: 4492
+	Time step 30 out of 72	Particles: 6779
+	Time step 40 out of 72	Particles: 9050
+	Time step 50 out of 72	Particles: 11262
+	Time step 60 out of 72	Particles: 13431
+	Time step 70 out of 72	Particles: 15610
+*************************************************************************
+END /home/fynn/Repositories/BladeWakeOPT/01_single_turbine_simulation/data_out/NREL5MW_turbine_simulation/NREL5MW_turbine_simulation_pfield
+	2024-01-14T22:09:52.050
+*************************************************************************
+ELAPSED TIME: 0 hours 1 minutes 6 seconds

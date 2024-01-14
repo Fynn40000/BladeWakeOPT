@@ -13,6 +13,8 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
                                                   postprocess_fdom::Bool=true,    # postprocessing the fluiddomain?
                                                   # ----- SETTINGS FOR POSTPROCESSING -------------
                                                   Vinf = (X, t)->zeros(3),        # Freestream Velocity
+                                                  magVinfx = 1,                   # Freestream Velocity in x direction
+                                                  sim_time = 1,                   # Overall (real) simulation time in seconds
                                                   rev_to_average_idx=1,           # Revolution to wich the postprocessing should be applied on
                                                   nrevs_to_average=1,             # number of Revolutions to average for postprocessing the bladeloads
                                                   num_elements::Int64=1,          # number of blade elements per blade
@@ -69,7 +71,12 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     #simdata = CSV.read(joinpath(save_path, run_name*"_convergence.csv"), DataFrame)
     # Calculate nsteps_per_rev
     #nsteps_per_rev[run_name] = ceil(Int, 360 / (simdata[2, 1] - simdata[1, 1]))
+    
+    # calculate number of planes to postprocess 
+    approx_x_range = magVinfx * sim_time
+    x_max_calc = approx_x_range / (2*R)       # calculated maximum x boundary based on wind velocity and simulation time
 
+    # set time steps to be postprocessed via the postprocess_fluiddomain function
     timesteps_to_evaluate = tsteps
 
 
@@ -91,7 +98,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     y_b_min = -0.7
     z_b_min = (-(vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
     # grid maximum boundaries (bound_factor*2*R in meters)
-    x_b_max = 15
+    x_b_max = x_max_calc#15
     y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 
@@ -118,7 +125,8 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
 
     # --------------- postprocess y-z-plane -------------------
 
-    for x in 1:1:15 # x represents the stations a y-z-plane will be added
+    x_max_calc = floor(x_max_calc)
+    for x in 1:1:x_max_calc # x represents the x-coordinate stations a y-z-plane will be calculated for
       x_loc = x   # x coordinate location of plane = x_loc*2*R in meters
       file_suffix = "_y_z_atx$(x_loc)D"
       push!(file_suffixes, file_suffix)
