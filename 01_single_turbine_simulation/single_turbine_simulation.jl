@@ -26,7 +26,7 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 36                        # number of revolutions to run => defines the length of the simulation
+run_length      = 8#36                        # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 paraview        = true                      # Whether to visualize with Paraview
@@ -131,6 +131,8 @@ elseif fidelity == "high"
 end
 
 shed_unsteady   = true                        # Whether to shed vorticity from unsteady loading
+unsteady_shedcrit = 0.001                     # Shed unsteady loading whenever circulation
+                                              #  fluctuates by more than this ratio (default = 0.01)
 max_particles   = ((2*n+1)*B)*nsteps*p_per_step + 1 # Maximum number of particles
 
 # Regularization
@@ -366,16 +368,21 @@ uns.run_simulation(simulation, nsteps;
                     # ----- SOLVERS OPTIONS ----------------
                     p_per_step=p_per_step,
                     max_particles=max_particles,
+                    vpm_integration=vpm_integration,
                     vpm_viscous=vpm_viscous,
+                    vpm_SFS=vpm_SFS,
                     sigma_vlm_surf=sigma_rotor_surf,
                     sigma_rotor_surf=sigma_rotor_surf,
                     sigma_vpm_overwrite=sigma_vpm_overwrite,
+                    sigmafactor_vpmonvlm=sigmafactor_vpmonvlm,
                     vlm_vortexsheet = false, # Whether to spread surface circulation as a vortex sheet in the VPM (turns ASM on; ALM if false)
                     vlm_rlx=vlm_rlx, # VLM relaxation (>0.9 can cause divergence, <0.2 slows simulation too much, deactivated with <0)
                     hubtiploss_correction=hubtiploss_correction, # Hub and tip loss correction of rotors (ignored in quasi-steady solver)
                     wake_coupled = true,          # true => VLM is used; false => BEM is used
-                    shed_unsteady=shed_unsteady,
                     shed_starting=shed_starting,
+                    shed_unsteady=shed_unsteady,
+                    unsteady_shedcrit=unsteady_shedcrit,
+                    omit_shedding=omit_shedding,
                     extra_runtime_function=runtime_function,#monitor_rotor,
                     # ----- OUTPUT OPTIONS ------------------
                     save_path=save_path,
@@ -393,15 +400,15 @@ fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_po
                                                          plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
                                                          postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                                          # ----- SETTINGS FOR POSTPROCESSING -------------
-                                                         Vinf = Vinf,        # Freestream Velocity
+                                                         Vinf = Vinf,                           # Freestream Velocity
                                                          rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
                                                          nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
                                                          num_elements=n,                        # number of blade elements per blade
-                                                         tsteps = [nsteps-1],                          # time steps to be postprocessed
+                                                         tsteps = [nsteps-1],                   # time steps to be postprocessed
                                                          debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
                                                          suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
-                                                         gridsize_x_y=0.5,                      # grid size of x-y fluid domain plane in meters
-                                                         gridsize_y_z=0.5                       # grid size of y-z fluid domain plane in meters
+                                                         gridsize_x_y=0.25,                      # grid size of x-y fluid domain plane in meters
+                                                         gridsize_y_z=0.25                       # grid size of y-z fluid domain plane in meters
                                                          )
 
 # ----------------- 7) VISUALIZATION -------------------------------------------
