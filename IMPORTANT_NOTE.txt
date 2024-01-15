@@ -1,6 +1,5 @@
 IMPORTANT:
-Alternatively to the following options, simply overwrite the "src/FLOWVLM_rotor.jl" file within the FLOWVLM Repository under the Julia packages
-with all functions given in file "functions/OwnFunctions_FLOWVLM_rotor.jl" within the BladeWakeOPT Repository (this Repository)
+Alternatively to the following options, simply overwrite some functions of the "src/FLOWVLM_rotor.jl" file within the FLOWVLM Repository under the Julia packages with all according functions given in file "functions/OwnFunctions_FLOWVLM_rotor.jl" within the BladeWakeOPT Repository (this Repository)
 => note: the magVinfx variable must be changed to the conditions to be simulated
 
 -------------------------- 1 --------------------------
@@ -41,10 +40,10 @@ function _calc_distributedloads_lookuptable(ccbrotor::OCCBRotor,
 	
     =>
     # If a turbine is calculated then return the cn and ct coefficients normed by the freestream velocity in x direction
-    if turbine_flag
-      magVinfx = 11.4							# ENTER THE FREESTREAM VELOCITY HERE
-      aux2 = 0.5*ccbinflow.rho*(magVinfx*magVinfx)*ccbrotor.r[i] 	# Wind turbine norm factor
-      cn[i] = Np[i] / aux2
-      ct[i] = Tp[i] / aux2
-    end
+    #if turbine_flag
+    #  magVinfx = 11.4							# ENTER THE FREESTREAM VELOCITY HERE
+    #  aux2 = 0.5*ccbinflow.rho*(magVinfx*magVinfx)*ccbrotor.r[i] 	# Wind turbine norm factor
+    #  cn[i] = Np[i] / aux2
+    #  ct[i] = Tp[i] / aux2
+    #end
     <=

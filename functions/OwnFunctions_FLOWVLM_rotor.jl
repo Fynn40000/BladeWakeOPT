@@ -44,6 +44,8 @@ function calc_distributedloads(self::Rotor, Vinf, RPM, rho::FWrap;
         data_flowangledeg = FArrWrap[]
         data_Vx_out = FArrWrap[]
         data_Vy_out = FArrWrap[]
+        data_F_out  = FArrWrap[]
+        data_loc_solidity = FArrWrap[]
         if !_lookuptable
             data_a      = FArrWrap[]
             data_ap     = FArrWrap[]
@@ -94,7 +96,8 @@ function calc_distributedloads(self::Rotor, Vinf, RPM, rho::FWrap;
     if _lookuptable
       (Np, Tp, uvec, vvec, gamma,
       cn, ct, cl, cd, thetaeffdeg, mu_drag,
-      twistdeg, flowangledeg, Vx_out, Vy_out) = _calc_distributedloads_lookuptable(occbrotor,
+      twistdeg, flowangledeg, Vx_out, Vy_out, 
+      F_out, loc_solidity) = _calc_distributedloads_lookuptable(occbrotor,
                                                         occbinflow, turbine_flag;
                                                         hubtiploss_correction=hubtiploss_correction)
       push!(gammas, gamma)
@@ -142,6 +145,8 @@ function calc_distributedloads(self::Rotor, Vinf, RPM, rho::FWrap;
           push!(data_flowangledeg, flowangledeg)
           push!(data_Vx_out, Vx_out)
           push!(data_Vy_out, Vy_out)
+          push!(data_F_out, F_out)
+          push!(data_loc_solidity, loc_solidity)
             if !_lookuptable
                 push!(data_a      , a)
                 push!(data_ap     , ap)
@@ -253,6 +258,18 @@ function calc_distributedloads(self::Rotor, Vinf, RPM, rho::FWrap;
                 "field_name" => "Vy_out",
                 "field_type" => "scalar",
                 "field_data" => data_Vy_out
+                )
+        self.sol[field["field_name"]] = field
+        field = Dict(
+                "field_name" => "F_out",
+                "field_type" => "scalar",
+                "field_data" => data_F_out
+                )
+        self.sol[field["field_name"]] = field
+        field = Dict(
+                "field_name" => "loc_solidity",
+                "field_type" => "scalar",
+                "field_data" => data_loc_solidity
                 )
         self.sol[field["field_name"]] = field
         if !_lookuptable
@@ -468,104 +485,114 @@ given inflow (this assumes that the inflow already includes all induced velocity
 and it is the effective inflow).
 """
 function _calc_distributedloads_lookuptable(ccbrotor::OCCBRotor,
-                                            ccbinflow::OCCBInflow,
-                                            turbine_flag::Bool;
-                                            hubtiploss_correction=hubtiploss_nocorrection)
+  ccbinflow::OCCBInflow,
+  turbine_flag::Bool;
+  hubtiploss_correction=hubtiploss_nocorrection)
 
-  # check if propeller
-  swapsign = turbine_flag ? 1 : -1
+# check if propeller
+swapsign = turbine_flag ? 1 : -1
 
-  # initialize arrays
-  n = length(ccbrotor.r)
-  Np = fill(0.0, n)
-  Tp = fill(0.0, n)
-  cn = fill(0.0, n)
-  ct = fill(0.0, n)
-  cl = fill(0.0, n)
-  cd = fill(0.0, n)
-  uvec = fill(0.0, n)
-  vvec = fill(0.0, n)
-  gamma = fill(0.0, n)
-  mu_drag = fill(0.0, n)
-  thetaeffdeg = fill(0.0, n)
-  twistdeg = fill(0.0, n)
-  flowangledeg = fill(0.0, n)
-  Vx_out = swapsign*ccbinflow.Vx
-  Vy_out = ccbinflow.Vy
-  
+# initialize arrays
+n = length(ccbrotor.r)
+Np = fill(0.0, n)
+Tp = fill(0.0, n)
+cn = fill(0.0, n)
+ct = fill(0.0, n)
+cl = fill(0.0, n)
+cd = fill(0.0, n)
+uvec = fill(0.0, n)
+vvec = fill(0.0, n)
+gamma = fill(0.0, n)
+mu_drag = fill(0.0, n)
+thetaeffdeg = fill(0.0, n)
+twistdeg = fill(0.0, n)
+flowangledeg = fill(0.0, n)
+Vx_out = swapsign*ccbinflow.Vx
+Vy_out = ccbinflow.Vy
+F_out = fill(0.0, n)
+loc_solidity = fill(0.0, n)
 
-  for i in 1:n
-    twist = swapsign*ccbrotor.theta[i]
-    Vx = swapsign*ccbinflow.Vx[i]
-    Vy = ccbinflow.Vy[i]
-
-    aux1 = 0.5*ccbinflow.rho*(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]
-
-    # Effective angle of attack (rad)
-    thetaV = atan(Vx, Vy)
-    thetaeff = thetaV - twist
-
-    thetaeffdeg[i] = thetaeff*180/pi
-    twistdeg[i] = twist*180/pi
-    flowangledeg[i] = thetaV*180/pi
-    #println("angles = $([thetaeff, thetaV, twist]*180/pi)\tVx,Vy=$([Vx, Vy])")
-
-    # airfoil cl/cd
-    #cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], thetaeff) # THIS IS THE ORIGINAL CODELINE
-    cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], -1*swapsign*thetaeff)
-    cl[i] = -1*swapsign*cl[i] 
-    #println("cl = $(cl[i]), cd = $(cd[i]), theta = $(thetaeffdeg[i]), index = $(i), r = $(ccbrotor.r[i])")
-    #println("Airfoildata = $(ccbrotor.af[i])")
+# Radial length of every horseshoe
+lengths = Float64[2*(ccbrotor.r[1]-ccbrotor.Rhub)]
+for i in 2:n
+push!(lengths, 2*(ccbrotor.r[i]-ccbrotor.r[i-1])-lengths[end] )
+end
 
 
-    # Tip and hub correction factor
-    B, Rtip, Rhub, r = ccbrotor.B, ccbrotor.Rtip, ccbrotor.Rhub, ccbrotor.r[i]
-    (eh1, eh2, eh3, maxah), (et1, et2, et3, maxat) = hubtiploss_correction
+for i in 1:n
+twist = swapsign*ccbrotor.theta[i]
+Vx = swapsign*ccbinflow.Vx[i]
+Vy = ccbinflow.Vy[i]
 
-    factorhub = B/2.0*(   (r/Rhub)^eh1 - 1   )^eh2/abs(sin(max(maxah*pi/180, abs(thetaV))))^eh3
-    Fhub = 2.0/pi*acos(exp(-factorhub))
+aux1 = 0.5*ccbinflow.rho*(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]
 
-    factortip = B/2.0*(  (Rtip/r)^et1 - 1  )^et2/abs(sin(max(maxat*pi/180, abs(thetaV))))^et3
-    Ftip = 2.0/pi*acos(exp(-factortip))
+# Effective angle of attack (rad)
+thetaV = atan(Vx, Vy)
+thetaeff = thetaV - twist
 
-    F = Ftip * Fhub
+thetaeffdeg[i] = thetaeff*180/pi
+twistdeg[i] = twist*180/pi
+flowangledeg[i] = thetaV*180/pi
+#println("angles = $([thetaeff, thetaV, twist]*180/pi)\tVx,Vy=$([Vx, Vy])")
 
-    cl[i] *= F
-    # NOTE: Here we leave cd uncorrected assuming that it is all friction and form drag
-    # cd[i] *= F
-
-    # normal and tangential coefficients
-    sthtV = sin(thetaV)
-    cthtV = cos(thetaV)
-    cn[i] = cl[i]*cthtV + cd[i]*sthtV # ?????
-    ct[i] = swapsign*(cl[i]*sthtV - cd[i]*cthtV)
+# airfoil cl/cd
+#cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], thetaeff) # THIS IS THE ORIGINAL CODELINE
+cl[i], cd[i] = occb_airfoil(ccbrotor.af[i], -1*swapsign*thetaeff)
+cl[i] = -1*swapsign*cl[i] 
 
 
-    # Normal and tangential forces per unit length
-    Np[i] = cn[i]*aux1
-    Tp[i] = ct[i]*aux1
+# Tip and hub correction factor
+B, Rtip, Rhub, r = ccbrotor.B, ccbrotor.Rtip, ccbrotor.Rhub, ccbrotor.r[i]
+(eh1, eh2, eh3, maxah), (et1, et2, et3, maxat) = hubtiploss_correction
 
-    # If a turbine is calculated then return the cn and ct coefficients normed by the freestream velocity in x direction
-    #if turbine_flag
-    #  magVinfx = 11.4                                             # ENTER THE FREESTREAM VELOCITY HERE
-    #  aux2 = 0.5*ccbinflow.rho*(magVinfx*magVinfx)*ccbrotor.r[i]  # Wind turbine norm factor
-    #  cn[i] = Np[i] / aux2
-    #  ct[i] = Tp[i] / aux2
-    #end
+factorhub = B/2.0*(   (r/Rhub)^eh1 - 1   )^eh2/abs(sin(max(maxah*pi/180, abs(thetaV))))^eh3
+Fhub = 2.0/pi*acos(exp(-factorhub))
 
-    # Circulation
-    gamma[i] = cl[i]*sqrt(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]/2
+factortip = B/2.0*(  (Rtip/r)^et1 - 1  )^et2/abs(sin(max(maxat*pi/180, abs(thetaV))))^et3
+Ftip = 2.0/pi*acos(exp(-factortip))
 
-    # Dragging line dipole strength (see Caprace's thesis, 2020)
-    # mu_drag[i] = cd[i]*sqrt(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]/2
-    # NOTE: Here I'm correcting DG's model dividing by chord length and later
-    #       multiplying by the traveled distance to account for the time step
-    mu_drag[i] = cd[i]*sqrt(Vx*Vx+Vy*Vy)/2
-  end
+F = Ftip * Fhub
 
-  # reverse sign of outputs for propellers
-  # Tp *= swapsign # I already reversed this
-  vvec *= swapsign
+cl[i] *= F
+F_out[i] = F
+loc_solidity[i] = (ccbrotor.B*ccbrotor.chord[i])/ (2*pi*ccbrotor.r[i]) # calculate the local solidity
+# NOTE: Here we leave cd uncorrected assuming that it is all friction and form drag
+# cd[i] *= F
 
-  return Np, Tp, uvec, vvec, gamma, cn, ct, cl, cd, thetaeffdeg, mu_drag, twistdeg, flowangledeg, Vx_out, Vy_out
+# normal and tangential coefficients
+sthtV = sin(thetaV)
+cthtV = cos(thetaV)
+cn[i] = cl[i]*cthtV + cd[i]*sthtV # ?????
+ct[i] = swapsign*(cl[i]*sthtV - cd[i]*cthtV)
+
+
+# Normal and tangential forces per unit length
+Np[i] = cn[i]*aux1
+Tp[i] = ct[i]*aux1
+
+# If a turbine is calculated then return the cn and ct coefficients normed by the freestream velocity in x direction
+if turbine_flag
+magVinfx = 11.4                                             # ENTER THE FREESTREAM VELOCITY HERE
+aux2 = 0.5*ccbinflow.rho*(magVinfx*magVinfx)*pi*(ccbrotor.Rtip * ccbrotor.Rtip)  # Wind turbine norm factor
+
+cn[i] = (Np[i]*lengths[i]) / aux2
+ct[i] = (Tp[i]*lengths[i]) / aux2
+end
+
+
+# Circulation
+gamma[i] = cl[i]*sqrt(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]/2
+
+# Dragging line dipole strength (see Caprace's thesis, 2020)
+# mu_drag[i] = cd[i]*sqrt(Vx*Vx+Vy*Vy)*ccbrotor.chord[i]/2
+# NOTE: Here I'm correcting DG's model dividing by chord length and later
+#       multiplying by the traveled distance to account for the time step
+mu_drag[i] = cd[i]*sqrt(Vx*Vx+Vy*Vy)/2
+end
+
+# reverse sign of outputs for propellers
+# Tp *= swapsign # I already reversed this
+vvec *= swapsign
+
+return Np, Tp, uvec, vvec, gamma, cn, ct, cl, cd, thetaeffdeg, mu_drag, twistdeg, flowangledeg, Vx_out, Vy_out, F_out, loc_solidity
 end

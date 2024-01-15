@@ -26,14 +26,14 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 2#36                        # number of revolutions to run => defines the length of the simulation
+run_length      = 2#36                     # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
-show_bladeload_plots = true                 # show the bladeload plots on display after postprocessing?
+show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
@@ -55,7 +55,7 @@ turbine_flag    = true                                                      # Th
 
 # Discretization
 if fidelity == "low"
-    n               = 20                         # Number of blade elements per blade
+    n               = 50#20                         # Number of blade elements per blade
 elseif fidelity == "mid"
     n               = 50                                                
 elseif fidelity == "high"

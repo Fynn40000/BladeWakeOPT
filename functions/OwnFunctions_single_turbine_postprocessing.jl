@@ -68,11 +68,12 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
                                                                 num_elements= num_elements
                                                                 )
   elseif file_marker == "_loft"
-    (roR, Gamma, Np, Tp, L, D,
-     cn, ct, cl, cd,
-     a, a_tangential, 
-     aoa, twist, flowangle, 
-     Vx, Vy, w) =        uns.postprocess_bladeloading_turbine(r_path;
+    (roR1, Gamma1, Np1, Tp1, L1, D1,
+     cn1, ct1, cl1, cd1,
+     _, _,#a, a_tangential,
+     aoa1, twist1, flowangle1, 
+     Vx1, Vy1, w1,
+     F1, loc_solidity1) =        uns.postprocess_bladeloading_turbine(r_path;
                                                               O           = zeros(3),
                                                               rotor_axis  = rotor_axis,
                                                               filename    = run_name*"_Rotor_Blade1"*file_marker*"-statistics.vtk",
@@ -80,8 +81,59 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
                                                               num_elements= num_elements,
                                                               debug=debug
                                                               )
-    rs = roR .* R
 
+     (roR2, Gamma2, Np2, Tp2, L2, D2,
+     cn2, ct2, cl2, cd2,
+     _, _,#a, a_tangential,
+     aoa2, twist2, flowangle2, 
+     Vx2, Vy2, w2,
+     F2, loc_solidity2) =        uns.postprocess_bladeloading_turbine(r_path;
+                                                              O           = zeros(3),
+                                                              rotor_axis  = rotor_axis,
+                                                              filename    = run_name*"_Rotor_Blade2"*file_marker*"-statistics.vtk",
+                                                              fieldsuff   = "-mean",
+                                                              num_elements= num_elements,
+                                                              debug=debug
+                                                              )
+
+     (roR3, Gamma3, Np3, Tp3, L3, D3,
+     cn3, ct3, cl3, cd3,
+     _, _,#a, a_tangential,
+     aoa3, twist3, flowangle3, 
+     Vx3, Vy3, w3,
+     F3, loc_solidity3) =        uns.postprocess_bladeloading_turbine(r_path;
+                                                              O           = zeros(3),
+                                                              rotor_axis  = rotor_axis,
+                                                              filename    = run_name*"_Rotor_Blade3"*file_marker*"-statistics.vtk",
+                                                              fieldsuff   = "-mean",
+                                                              num_elements= num_elements,
+                                                              debug=debug
+                                                              )
+
+    roR = ((roR1 .+ roR2 .+ roR3) ./ 3)
+    rs = roR .* R
+    Gamma = ((Gamma1 .+ Gamma2 .+ Gamma3) ./ 3)
+    Np = ((Np1 .+ Np2 .+ Np3) ./ 3)
+    Tp = ((Tp1 .+ Tp2 .+ Tp3) ./ 3)
+    L = ((L1 .+ L2 .+ L3) ./ 3)
+    D = ((D1 .+ D2 .+ D3) ./ 3)
+    cn_oneblade = ((cn1 .+ cn2 .+ cn3) ./ 3)
+    ct_oneblade = ((ct1 .+ ct2 .+ ct3) ./ 3)
+    cn = (cn1 .+ cn2 .+ cn3)
+    ct = (ct1 .+ ct2 .+ ct3)
+    cl = ((cl1 .+ cl2 .+ cl3) ./ 3)
+    cd = ((cd1 .+ cd2 .+ cd3) ./ 3)
+    aoa = ((aoa1 .+ aoa2 .+ aoa3) ./ 3)
+    twist = ((twist1 .+ twist2 .+ twist3) ./ 3)
+    flowangle = ((flowangle1 .+ flowangle2 .+ flowangle3) ./ 3)
+    Vx = ((Vx1 .+ Vx2 .+ Vx3) ./ 3)
+    Vy = ((Vy1 .+ Vy2 .+ Vy3) ./ 3)
+    w = ((w1 .+ w2 .+ w3) ./ 3)
+    F = ((F1 .+ F2 .+ F3) ./ 3)
+    loc_solidity = ((loc_solidity1 .+ loc_solidity2 .+ loc_solidity3) ./ 3)
+
+    a = 1 ./ (1 .+ ((4 .* sin.(flowangle) .* sin.(flowangle)) ./ (loc_solidity .* cl .* cos.(flowangle))) )
+    a_tangential = 1 ./ (((4 .* cos.(flowangle)) ./ (loc_solidity .* cl)) .- 1)
   end
 
   #--------------------------------------------
@@ -99,7 +151,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   #--------------------------------------------
   # Start plotting - Np
   xlabel=L"Radial position $r/R$" 
-  ylabel=L"Loading ($\mathrm{N/m}$)"
+  ylabel=L"Thrust force ($\mathrm{N/m}$)"
   linelabel=L"$F_{T}$ distribution"
   filename="Np_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
   plot_var(rs/R, Np, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -111,7 +163,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
   #--------------------------------------------
   # Start plotting - Tp
   xlabel=L"Radial position $r/R$" 
-  ylabel=L"Loading ($\mathrm{N/m}$)"
+  ylabel=L"Tangential force ($\mathrm{N/m}$)"
   linelabel=L"$F_{t}$ distribution"
   filename="Tp_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
   plot_var(rs/R, Tp, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -125,7 +177,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     #--------------------------------------------
     # Start plotting - L
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Lift $F_{L}$ ($\mathrm{N/m}$))"
+    ylabel=L"Lift $F_{L}$ ($\mathrm{N/m}$)"
     linelabel=L"$F_{L}$ distribution"
     filename="L_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, L, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -137,10 +189,34 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     #--------------------------------------------
     # Start plotting - D
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Drag $F_{D}$ ($\mathrm{N/m}$))"
+    ylabel=L"Drag $F_{D}$ ($\mathrm{N/m}$)"
     linelabel=L"$F_{D}$ distribution"
     filename="D_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, D, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - cn_oneblade
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Thrust coefficient $C_{T}$ (-)"
+    linelabel=L"$C_{T}$ distribution"
+    filename="cn_oneblade_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, cn_oneblade, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - ct_oneblade
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Tangential force coefficient $C_{t}$ (-)"
+    linelabel=L"$C_{t}$ distribution"
+    filename="ct_oneblade_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, ct_oneblade, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
             dx=0.1,
             suppress_plots=suppress_plots
@@ -161,7 +237,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     #--------------------------------------------
     # Start plotting - ct
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Thangential force coefficient $C_{t}$ (-)"
+    ylabel=L"Tangential force coefficient $C_{t}$ (-)"
     linelabel=L"$C_{t}$ distribution"
     filename="ct_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, ct, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -197,7 +273,7 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     #--------------------------------------------
     # Start plotting - a
     xlabel=L"Radial position $r/R$" 
-    ylabel=L"Induction factor $a$ (-)"
+    ylabel=L"Axial induction factor $a$ (-)"
     linelabel=L"$a$ distribution"
     filename="a_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, a, xlabel, ylabel, linelabel,save_path_post, filename;
@@ -285,6 +361,30 @@ function plot_blade_loading(save_path::String, save_path_post::String, run_name:
     linelabel=L"$w$ distribution"
     filename="w_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
     plot_var(rs/R, w, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - F
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"Prandtl loss factor (-)"
+    linelabel=L"$F$ distribution"
+    filename="F_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, F, xlabel, ylabel, linelabel,save_path_post, filename;
+            xlims=[0,1],
+            dx=0.1,
+            suppress_plots=suppress_plots
+            )
+
+    #--------------------------------------------
+    # Start plotting - loc_solidity
+    xlabel=L"Radial position $r/R$" 
+    ylabel=L"local solidity (-)"
+    linelabel=L"$\sigma'$ distribution"
+    filename="loc_solidity_over_rtoR-$(nrevs_to_average)RevsAveragedToRevNo$(rev_to_average_idx)"*file_marker
+    plot_var(rs/R, loc_solidity, xlabel, ylabel, linelabel,save_path_post, filename;
             xlims=[0,1],
             dx=0.1,
             suppress_plots=suppress_plots

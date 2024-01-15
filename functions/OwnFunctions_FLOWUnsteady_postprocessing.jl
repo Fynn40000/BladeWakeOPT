@@ -22,7 +22,7 @@ the circulation and force components of the load distribution along the blade.
 
 Return: `rs, Gamma, Np, Tp, Rp, Zhat, Rhat, That, Ftot` for "_vlm" files 
 and
-Return: `roR, Gamma, Np, Tp, L, D, cn, ct, cl, cd, a, a_tangential, aoa, twist, flowangle, Vx, Vy, w, Zhat` for "_loft" files
+Return: `roR, Gamma, Np, Tp, L, D, cn, ct, cl, cd, a, a_tangential, aoa, twist, flowangle, Vx, Vy, w, F, loc_solidity, Zhat` for "_loft" files
 """
 function postprocess_bladeloading_turbine(read_path;
                                     O           = zeros(3),     # Rotor center
@@ -95,6 +95,9 @@ function postprocess_bladeloading_turbine(read_path;
 
             Vx = data["POINT_DATA"]["Vx_out"*fieldsuff][1:end] # local flow velocity at controlpoint (x direction)
             Vy = data["POINT_DATA"]["Vy_out"*fieldsuff][1:end] # local flow velocity at controlpoint (y direction)
+
+            F = data["POINT_DATA"]["F_out"*fieldsuff][1:end]   # Prandtl loss factor
+            loc_solidity = data["POINT_DATA"]["loc_solidity"*fieldsuff][1:end]   # local solidity
         else
             L = nothing
             D = nothing
@@ -107,6 +110,8 @@ function postprocess_bladeloading_turbine(read_path;
             flowangle = nothing
             Vx = nothing
             Vy = nothing
+            F = nothing
+            loc_solidity = nothing
             w = nothing
             a = nothing
             a_tangential = nothing
@@ -133,6 +138,8 @@ function postprocess_bladeloading_turbine(read_path;
             flowangle = _clear_arr(flowangle, num_elements)
             Vx = _clear_arr(Vx, num_elements)
             Vy = _clear_arr(Vy, num_elements)
+            F = _clear_arr(F, num_elements)
+            loc_solidity = _clear_arr(loc_solidity, num_elements)
 
             # Calculate relative flow velocity based on given flow triangle
             w = sqrt.(Vx .* Vx .+ Vy .* Vy)
@@ -142,7 +149,7 @@ function postprocess_bladeloading_turbine(read_path;
             a_tangential = (1 .- sqrt.(1 .- ct)) ./ 2
         end
 
-        return roR, Gamma, Np, Tp, L, D, cn, ct, cl, cd, a, a_tangential, aoa, twist, flowangle, Vx, Vy, w, _Ftot_axis
+        return roR, Gamma, Np, Tp, L, D, cn, ct, cl, cd, a, a_tangential, aoa, twist, flowangle, Vx, Vy, w, F, loc_solidity, _Ftot_axis
     end
 
 end
