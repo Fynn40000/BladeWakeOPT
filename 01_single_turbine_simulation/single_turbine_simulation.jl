@@ -26,9 +26,10 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 2#36                     # number of revolutions to run => defines the length of the simulation
+run_length      = 1#36                     # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
+postprocessing  = false                     # perform postprocessing in general???
 paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
@@ -70,6 +71,12 @@ r               = 1/10                       # Geometric expansion of elements
 
 # Read radius of this rotor and number of blades
 R, B            = uns.read_rotor(rotor_file; data_path=data_path)[[1,3]]
+
+# Set angle of attack boundaries manually here 
+# (this is an optional input when generating a rotor and will only calculate the 
+# specified boundaries for the (rediscretized) control point airfoil locations/positions)
+aoa_bounds = uns.DataFrames.DataFrame(uns.CSV.File(joinpath(data_path, "rotors", "NREL5MW_aoa_bounds.csv")))
+aoa_bounds = Array{Float64, 2}(aoa_bounds)
 
 # ----------------- SIMULATION PARAMETERS --------------------------------------
 
@@ -265,11 +272,17 @@ rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         xfoil=xfoil,
                                         ncrit=ncrit,
                                         turbine_flag=turbine_flag,
+                                        aoa_bounds=aoa_bounds,
                                         data_path=data_path,
                                         verbose=true,
                                         verbose_xfoil=false,
-                                        plot_disc=true
+                                        plot_disc=true,
+                                        save_polars=save_path
                                         );
+
+#println(rotor._r)
+#println(rotor._aoa_bound_min)
+#println(rotor._aoa_bound_max)
 
 println("Generating vehicle...")
 
@@ -390,49 +403,50 @@ uns.run_simulation(simulation, nsteps;
                     debug=debug
                     );
 
+if postprocessing
+    # ------------- 6) POSTPROCESSING ----------------------------------------------
 
-# ------------- 6) POSTPROCESSING ----------------------------------------------
+    #Post-process monitor plots
+    include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
+    fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
+                                                            # ----- POSTPROCESSING EXECUTION -------------
+                                                            plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
+                                                            postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
+                                                            # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                            Vinf = Vinf,                           # Freestream Velocity
+                                                            magVinfx = magVinfx,                   # Freestream Velocity in x direction
+                                                            sim_time = ttot,                       # Overall (real) simulation time in seconds
+                                                            rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
+                                                            nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
+                                                            num_elements=n,                        # number of blade elements per blade
+                                                            tsteps = [nsteps-1],                   # time steps to be postprocessed
+                                                            debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
+                                                            suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
+                                                            gridsize_x_y=0.25,                     # grid size of x-y fluid domain plane in meters
+                                                            gridsize_y_z=0.25                      # grid size of y-z fluid domain plane in meters
+                                                            )
 
-#Post-process monitor plots
-include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
-                                                         # ----- POSTPROCESSING EXECUTION -------------
-                                                         plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
-                                                         postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
-                                                         # ----- SETTINGS FOR POSTPROCESSING -------------
-                                                         Vinf = Vinf,                           # Freestream Velocity
-                                                         magVinfx = magVinfx,                   # Freestream Velocity in x direction
-                                                         sim_time = ttot,                       # Overall (real) simulation time in seconds
-                                                         rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
-                                                         nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
-                                                         num_elements=n,                        # number of blade elements per blade
-                                                         tsteps = [nsteps-1],                   # time steps to be postprocessed
-                                                         debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
-                                                         suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
-                                                         gridsize_x_y=0.25,                     # grid size of x-y fluid domain plane in meters
-                                                         gridsize_y_z=0.25                      # grid size of y-z fluid domain plane in meters
-                                                         )
+    # ----------------- 7) VISUALIZATION -------------------------------------------
+    if paraview
+        println("Calling Paraview...")
 
-# ----------------- 7) VISUALIZATION -------------------------------------------
-if paraview
-    println("Calling Paraview...")
-
-    # Files to open in Paraview
-    files = joinpath(save_path, run_name*"_pfield...xmf;")
-    for bi in 1:B
-        global files
-        files *= run_name*"_Rotor_Blade$(bi)_loft...vtk;"
-        files *= run_name*"_Rotor_Blade$(bi)_vlm...vtk;"
-    end
-
-    if postprocess_fdom
-        for suffix in fdom_suffixes
+        # Files to open in Paraview
+        files = joinpath(save_path, run_name*"_pfield...xmf;")
+        for bi in 1:B
             global files
-            files *= run_name*suffix
+            files *= run_name*"_Rotor_Blade$(bi)_loft...vtk;"
+            files *= run_name*"_Rotor_Blade$(bi)_vlm...vtk;"
         end
+
+        if postprocess_fdom
+            for suffix in fdom_suffixes
+                global files
+                files *= run_name*suffix
+            end
+        end
+
+        # Call Paraview
+        run(`paraview --data=$(files)`)
+
     end
-
-    # Call Paraview
-    run(`paraview --data=$(files)`)
-
 end
