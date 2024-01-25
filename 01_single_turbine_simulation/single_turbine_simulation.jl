@@ -26,10 +26,10 @@ save_path_post  = joinpath(save_path, "postprocessing") # Where to save postproc
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 1#36                     # number of revolutions to run => defines the length of the simulation
+run_length      = 15#36                     # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
-postprocessing  = false                     # perform postprocessing in general???
+postprocessing  = true                     # perform postprocessing in general???
 paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
@@ -280,9 +280,6 @@ rotor = uns.generate_rotor(rotor_file; pitch=pitch,
                                         save_polars=save_path
                                         );
 
-#println(rotor._r)
-#println(rotor._aoa_bound_min)
-#println(rotor._aoa_bound_max)
 
 println("Generating vehicle...")
 
@@ -402,6 +399,16 @@ uns.run_simulation(simulation, nsteps;
                     run_name=run_name,
                     debug=debug
                     );
+
+# Save the calculated aoa boundaries as csv files if desired
+OwnFunctions._create_csv(rotor._r, rotor._aoa_bound_min, save_path, "aoa_min_bound";
+                         x_name="r(m)",
+                         y_name="AOA_min(°)"
+                         )
+OwnFunctions._create_csv(rotor._r, rotor._aoa_bound_max, save_path, "aoa_max_bound";
+                         x_name="r(m)",
+                         y_name="AOA_max(°)"
+                         )
 
 if postprocessing
     # ------------- 6) POSTPROCESSING ----------------------------------------------
