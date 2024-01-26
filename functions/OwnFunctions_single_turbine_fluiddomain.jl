@@ -8,12 +8,14 @@ Postprocesses the fluiddomain of a single turbines simulation.
 "
 
 function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
-                                save_path::String,                      # path to folder where simulation is stored in
+                                simulation_path::String,                      # path to folder where simulation is stored in
                                 run_name::String,                       # name of simulation
                                 file_suffix::String,                    # postprocessed fluid domain file suffix
                                 R::Float64,                             # Rotor tip radius
                                 AOA::Float64,                           # Angle of attack
                                 nums::Vector{Int64};                    # Time steps to process
+                                # ----- OPTIONAL ARGUMENTS ----------
+                                save_path       = nothing,              # folder to store data in (if nothing, data will be stored under simulation_path)
                                 # ----- FREESTREAM VELOCITY ---------
                                 Vinf            = (X, t)->zeros(3),
                                 # ----- GRID OPTIONS ----------------  
@@ -43,8 +45,12 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   pfield_prefix   = run_name*"_pfield"               # Prefix of particle field files to read
   staticpfield_prefix = run_name*"_staticpfield"     # Prefix of static particle field files to read
 
-  r_path = save_path                        # path to read data from (path to folder all the simulation data is stored in)
-  s_path = save_path#joinpath(r_path, run_name*"-fdom")# path to folder all postprocessed fluiddomain files will be stored in
+  r_path = simulation_path                           # path to read data from (path to folder all the simulation data is stored in)
+  if save_path !== nothing                           # path to folder all postprocessed fluiddomain files will be stored in
+    s_path = save_path
+  else
+    s_path = simulation_path                         
+  end
 
   output_prefix   = run_name                # Prefix of output files
 

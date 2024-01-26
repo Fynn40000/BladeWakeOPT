@@ -34,12 +34,12 @@ paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
-show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
+show_bladeload_plots = true                # show the bladeload plots on display after postprocessing?
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
 # Rotor geometry
-rotor_file      = "NREL5MW.csv"                                             # Rotor geometry #apc10x7.csv
+rotor_file      = "NREL5MW.csv"                                             # Rotor geometry
 data_path       = joinpath(start_simulation_path, "..", "00_database")      # Path to rotor database
 pitch           = 0.0                                                       # (deg) collective pitch of blades
 CW              = true                                                      # Clock-wise rotation

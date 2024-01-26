@@ -7,7 +7,7 @@
 =###############################################################################
 
 
-function single_turbine_simulation_postprocessing(save_path::String, save_path_post::String, run_name::String, R::Float64, AOA::Float64; 
+function single_turbine_simulation_postprocessing(simulation_path::String, save_path_post::String, run_name::String, R::Float64, AOA::Float64; 
                                                   # ----- POSTPROCESSING EXECUTION ----------------
                                                   plot_bladeloads::Bool=true,     # postprocessing the bladeloads?
                                                   postprocess_fdom::Bool=true,    # postprocessing the fluiddomain?
@@ -30,11 +30,11 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
   # postprocess the blade loadings if desired
   if plot_bladeloads
     # postprocess the statistics first by applying function uns.postprocess_statistics(...)
-    OwnFunctions.postprocess_statistics(save_path, run_name;
+    OwnFunctions.postprocess_statistics(simulation_path, run_name;
                                         rev_to_average_idx=rev_to_average_idx, 
                                         nrevs_to_average=nrevs_to_average)
     
-    #statistics_save_path = joinpath(save_path, run_name)
+    #statistics_save_path = joinpath(simulation_path, run_name)
 
     # create a folder to save the plots in
     if isdir(save_path_post)
@@ -45,14 +45,14 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     end
 
     # postprocess statistics of the "_vlm" statistics file regarding blade 1
-    OwnFunctions.plot_blade_loading(save_path, save_path_post, run_name, R; 
+    OwnFunctions.plot_blade_loading(simulation_path, save_path_post, run_name, R; 
                                     file_marker="_vlm",
                                     rev_to_average_idx=rev_to_average_idx, 
                                     nrevs_to_average=nrevs_to_average,
                                     num_elements=num_elements,
                                     suppress_plots=suppress_plots)
     # postprocess statistics of the "_loft" statistics file regarding blade 1
-    OwnFunctions.plot_blade_loading(save_path, save_path_post, run_name, R; 
+    OwnFunctions.plot_blade_loading(simulation_path, save_path_post, run_name, R; 
                                     file_marker="_loft",
                                     rev_to_average_idx=rev_to_average_idx, 
                                     nrevs_to_average=nrevs_to_average,
@@ -68,7 +68,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
   if postprocess_fdom
 
     # read simulation data
-    #simdata = CSV.read(joinpath(save_path, run_name*"_convergence.csv"), DataFrame)
+    #simdata = CSV.read(joinpath(simulation_path, run_name*"_convergence.csv"), DataFrame)
     # Calculate nsteps_per_rev
     #nsteps_per_rev[run_name] = ceil(Int, 360 / (simdata[2, 1] - simdata[1, 1]))
     
@@ -102,7 +102,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
     y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 
-    OwnFunctions.postprocess_fluiddomain(save_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
+    OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
                                          # ----- FREESTREAM VELOCITY ---------
                                          Vinf            = Vinf,
                                          # ----- GRID OPTIONS ----------------  
@@ -148,7 +148,7 @@ function single_turbine_simulation_postprocessing(save_path::String, save_path_p
 
 
 
-      OwnFunctions.postprocess_fluiddomain(save_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
+      OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
                                           # ----- FREESTREAM VELOCITY ---------
                                           Vinf            = Vinf,
                                           # ----- GRID OPTIONS ----------------  
