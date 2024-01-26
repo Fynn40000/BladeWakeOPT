@@ -27,9 +27,9 @@ using .OwnFunctions                                                             
 # Folders and paths
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", "NREL5MW_turbine_simulation")   # Folder of simulation to be evaluated
 run_name = "NREL5MW_turbine_simulation"                                                                                      # Name of this simulation
-#postprocessed_fluiddomain_name = "all_timesteps_NREL5MW_lowfid"                                                                     # Give the postprocessed fluid domain a name. 
+folder_name_fluiddomain = run_name*"-lowfid_15Revs_ev2nd_tstep"                                                                     # Give the postprocessed fluid domain a name. 
                                                                                                                                     #  This will be the name of the folder all fluiddomain files will be stored in.
-save_path = joinpath(this_file_path, "data_out", run_name)                                                                           # Folder to store postprocessed fluiddomain files in
+save_path = joinpath(this_file_path, "data_out", folder_name_fluiddomain)                                                                           # Folder to store postprocessed fluiddomain files in
 
 
 # turbine tip radius in (m)
@@ -41,16 +41,16 @@ AOA             = 0.0                                                           
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0]                                # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "manual"                                                            # tstep_method defines the timesteps to be calculated (Options: "manual", "all")
+tstep_method    = "all"                                                            # tstep_method defines the timesteps to be calculated (Options: "manual", "all")
                                                                                    #  => when "manual", jump to next section and specify the timesteps to be evaluated manually
 # => following variables are necessary when using tstep_method = "all"
 nrevs           = 15                                                               # number of revolutions the simulation was simulated with
 nsteps_per_rev  = 36                                                               # number of steps per revolution the simulation was simulated with
-stepwidth       = 2                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+stepwidth       = 5                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
 
 # grid to be calculated
 calc_grid_x_y   = true
-calc_grid_y_z   = true
+calc_grid_y_z   = false
 
 gridsize_x_y    = 0.5       # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.5       # grid size of y-z fluid domain plane in meters
