@@ -217,9 +217,9 @@ end
 #       This is especially helpful in low and mid-fidelity simulations.
 
 if fidelity == "low"
-    suppress_fountain   = true                  # Toggle
+    suppress_fountain   = false                  # Toggle
 elseif fidelity == "mid"
-    suppress_fountain   = true
+    suppress_fountain   = false
 elseif fidelity == "high"
     suppress_fountain   = false
 end
