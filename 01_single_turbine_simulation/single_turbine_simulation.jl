@@ -19,14 +19,14 @@ start_simulation_path = splitdir(@__FILE__)[1]
 include(joinpath(start_simulation_path, "..", "functions", "OwnFunctions.jl"))  # Read file with module definition first
 using .OwnFunctions                                                             # Include all self defined functions
 
-run_name        = "NREL5MW_turbine_simulation"       # Name of this simulation
-save_path       = joinpath(start_simulation_path, "data_out", run_name) # Where to save this simulation #splitdir(@__FILE__)[1] * "/data_out" * "/" * run_name                 
-save_path_post  = joinpath(save_path, "postprocessing") # Where to save postprocessing plots
+run_name        = "NREL5MW_turbine_simulation"                                  # Name of this simulation
+save_path       = joinpath(start_simulation_path, "data_out", run_name)         # Where to save this simulation           
+save_path_post  = joinpath(save_path, "postprocessing")                         # Where to save postprocessing plots
 
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 15#36                     # number of revolutions to run => defines the length of the simulation
+run_length      = 1#36                     # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 postprocessing  = true                     # perform postprocessing in general???
@@ -410,12 +410,13 @@ OwnFunctions._create_csv(rotor._r, rotor._aoa_bound_max, save_path, "aoa_max_bou
                          y_name="AOA_max(°)"
                          )
 
+# ------------- 6) POSTPROCESSING ----------------------------------------------
 if postprocessing
-    # ------------- 6) POSTPROCESSING ----------------------------------------------
+    println("\nPostprocessing...\n")
 
     #Post-process monitor plots
-    include(joinpath(start_simulation_path, "single_turbine_simulation_postprocessing.jl"))
-    fdom_suffixes = single_turbine_simulation_postprocessing(save_path, save_path_post, run_name, R, AOA;
+    fdom_suffixes = OwnFunctions.single_turbine_simulation_postprocessing(
+                                                            save_path, save_path_post, run_name, R, AOA;
                                                             # ----- POSTPROCESSING EXECUTION -------------
                                                             plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
                                                             postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?

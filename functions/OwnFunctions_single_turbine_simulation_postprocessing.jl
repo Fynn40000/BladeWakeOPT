@@ -1,9 +1,6 @@
 #=##############################################################################
 # DESCRIPTION
     Postprocessing single turbine simulations
-    Plots created for:
-        => Blade loads
-        => 
 =###############################################################################
 
 
@@ -23,9 +20,9 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
                                                   suppress_plots::Bool=true,      # suppresses the plots to show up on the display
                                                   gridsize_x_y::Float64=0.5,      # grid size of x-y fluid domain plane in meters
                                                   gridsize_y_z::Float64=0.5,      # grid size of y-z fluid domain plane in meters
+                                                  verbose = true
                                                   )
 
-  println("\nPostprocessing...\n")
   
   # postprocess the blade loadings if desired
   if plot_bladeloads
@@ -60,7 +57,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
                                     debug=debug,
                                     suppress_plots=suppress_plots)
 
-    println("\nBlade load plots saved under $(save_path_post)\n")
+    #println("\nBlade load plots saved under $(save_path_post)\n")
   end
 
 
