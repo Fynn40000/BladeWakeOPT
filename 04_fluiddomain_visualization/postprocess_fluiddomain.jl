@@ -46,7 +46,7 @@ tstep_method    = "all"                                                         
 # => following variables are necessary when using tstep_method = "all"
 nrevs           = 15                                                               # number of revolutions the simulation was simulated with
 nsteps_per_rev  = 36                                                               # number of steps per revolution the simulation was simulated with
-stepwidth       = 5                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+stepwidth       = 2                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
 
 # grid to be calculated
 calc_grid_x_y   = true
@@ -200,11 +200,11 @@ end
 
 
 println("Calling Paraview...")
-files = joinpath(save_path, run_name*file_suffixes[1])
+files_fdom = joinpath(save_path, run_name*file_suffixes[1])
 if length(file_suffixes)>1
     for suffix in file_suffixes[2:end]
-        global files
-        files *= run_name*suffix
+        global files_fdom
+        files_fdom *= run_name*suffix
     end
 end
 

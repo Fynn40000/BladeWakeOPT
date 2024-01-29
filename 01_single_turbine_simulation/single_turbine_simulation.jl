@@ -452,8 +452,15 @@ if postprocessing
             end
         end
 
+
+        # postprocess all timesteps via ths script
+        #include(joinpath("/home/fynn/Repositories/BladeWakeOPT/04_fluiddomain_visualization/postprocess_fluiddomain.jl"))
+
+
         # Call Paraview
         run(`paraview --data=$(files)`)
 
     end
+
+    
 end
