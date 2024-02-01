@@ -34,7 +34,10 @@ paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
-show_bladeload_plots = true                # show the bladeload plots on display after postprocessing?
+show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
+postprocess_all_tsteps_fdom = true          # postprocess all timesteps of the fluid domain?
+                                            # => NOTE: if true, you need to set up the script that gets called 
+                                            #          via this file with your desired inputs (see "6) POSTPROCESSING")
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
@@ -413,7 +416,7 @@ OwnFunctions._create_csv(rotor._r, rotor._aoa_bound_max, save_path, "aoa_max_bou
 # ------------- 6) POSTPROCESSING ----------------------------------------------
 if postprocessing
     println("\nPostprocessing...\n")
-
+    println("\n     => Blade loads and last time step fluiddomain...\n")
     #Post-process monitor plots
     fdom_suffixes = OwnFunctions.single_turbine_simulation_postprocessing(
                                                             save_path, save_path_post, run_name, R, AOA;
@@ -434,6 +437,12 @@ if postprocessing
                                                             gridsize_y_z=0.25                      # grid size of y-z fluid domain plane in meters
                                                             )
 
+    # postprocess all timesteps via ths script and call paraview to visualize them...
+    if postprocess_all_tsteps_fdom
+        println("\n     => All time steps fluiddomain...\n")
+        include(joinpath("/home/fynn/Repositories/BladeWakeOPT/04_fluiddomain_visualization/postprocess_fluiddomain.jl"))
+    end
+
     # ----------------- 7) VISUALIZATION -------------------------------------------
     if paraview
         println("Calling Paraview...")
@@ -452,10 +461,6 @@ if postprocessing
                 files *= run_name*suffix
             end
         end
-
-
-        # postprocess all timesteps via ths script
-        #include(joinpath("/home/fynn/Repositories/BladeWakeOPT/04_fluiddomain_visualization/postprocess_fluiddomain.jl"))
 
 
         # Call Paraview

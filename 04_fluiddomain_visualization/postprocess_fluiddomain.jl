@@ -26,11 +26,13 @@ using .OwnFunctions                                                             
 
 # Folders and paths
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", "NREL5MW_turbine_simulation")   # Folder of simulation to be evaluated
-run_name = "NREL5MW_turbine_simulation"                                                                                      # Name of this simulation
-folder_name_fluiddomain = run_name*"-lowfid_15Revs_ev2nd_tstep"                                                                     # Give the postprocessed fluid domain a name. 
-                                                                                                                                    #  This will be the name of the folder all fluiddomain files will be stored in.
-save_path = joinpath(this_file_path, "data_out", folder_name_fluiddomain)                                                                           # Folder to store postprocessed fluiddomain files in
+run_name = "NREL5MW_turbine_simulation"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+folder_name_fluiddomain = run_name*"-lowfid_15Revs_ev2nd_tstep"                                                              # Give the postprocessed fluid domain a name. 
+                                                                                                                             # => This will be the name of the folder all fluiddomain files will be stored in.
+save_path = joinpath(this_file_path, "data_out", folder_name_fluiddomain)                                                    # Folder to store postprocessed fluiddomain files in
 
+
+call_paraview = false                                                              # call paraview after postprocessing
 
 # turbine tip radius in (m)
 R = 63.0
@@ -41,8 +43,8 @@ AOA             = 0.0                                                           
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0]                                # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "all"                                                            # tstep_method defines the timesteps to be calculated (Options: "manual", "all")
-                                                                                   #  => when "manual", jump to next section and specify the timesteps to be evaluated manually
+tstep_method    = "manual"                                                            # tstep_method defines the timesteps to be calculated (Options: "manual", "all")
+                                                                                   # => when "manual", jump to next section and specify the timesteps to be evaluated manually
 # => following variables are necessary when using tstep_method = "all"
 nrevs           = 15                                                               # number of revolutions the simulation was simulated with
 nsteps_per_rev  = 36                                                               # number of steps per revolution the simulation was simulated with
@@ -52,19 +54,19 @@ stepwidth       = 2                                                             
 calc_grid_x_y   = true
 calc_grid_y_z   = false
 
-gridsize_x_y    = 0.5       # grid size of x-y fluid domain plane in meters
-gridsize_y_z    = 0.5       # grid size of y-z fluid domain plane in meters
+gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
+gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
 
 z_locs          = [0]       # z coordinate location of plane = z_loc*2*R in meters
 x_locs          = [1]       # x coordinate location of plane = x_loc*2*R in meters
 
-# x-y grid boundaries of x-y-plane (=> factor*2*R in meters)
+# x-y grid boundaries of x-y-plane (=> factor*2*R in meters) => Hub = coordinate origin
 x_b_min_for_x_y = -0.2
 y_b_min_for_x_y = -0.7
 x_b_max_for_x_y = 10                 
 y_b_max_for_x_y = 0.7
 
-# x-y grid boundaries of y-z-plane (=> factor*2*R in meters)
+# x-y grid boundaries of y-z-plane (=> factor*2*R in meters) => Hub = coordinate origin
 y_b_min_for_y_z = -0.7
 z_b_min_for_y_z = -0.7
 y_b_max_for_y_z = 0.7
@@ -75,8 +77,8 @@ z_b_max_for_y_z = 0.7
 # ----------------- 1) SET TIMESTEPS TO BE EVALUATED -------------------------------------------
 if tstep_method == "manual"
 
-    #tsteps = [10,15,20] # set by specific timesteps
-    tsteps = collect(1:2:10)      # set by own start, step and end time step (start:step:end)
+    tsteps = [10,15,20] # set by specific timesteps
+    #tsteps = collect(1:2:10)      # set by own start, step and end time step (start:step:end)
 
 elseif tstep_method == "all"
     nsteps = nrevs*nsteps_per_rev # Number of time steps
@@ -184,31 +186,29 @@ end
 
 # ----------------- 3) PARAVIEW ----------------------------------------------------
 
-# --------------- save the suffixes of the _fdom files that will be opened in paraview -------------------
-if length(tsteps) == 1
+if call_paraview
+    # --------------- save the suffixes of the _fdom files that will be opened in paraview -------------------
+    if length(tsteps) == 1
+        for i in 1:length(file_suffixes)
+        file_suffixes[i] = file_suffixes[i]*"_fdom.$(tsteps[1]).xmf;"
+        end
+    elseif length(tsteps) > 1
     for i in 1:length(file_suffixes)
-      file_suffixes[i] = file_suffixes[i]*"_fdom.$(tsteps[1]).xmf;"
+        file_suffixes[i] = file_suffixes[i]*"_fdom...xmf;"
     end
-elseif length(tsteps) > 1
-for i in 1:length(file_suffixes)
-    file_suffixes[i] = file_suffixes[i]*"_fdom...xmf;"
-end
-end
-
-#println(file_suffixes)
-#println("\n\n DONE!")
-
-
-println("Calling Paraview...")
-files_fdom = joinpath(save_path, run_name*file_suffixes[1])
-if length(file_suffixes)>1
-    for suffix in file_suffixes[2:end]
-        global files_fdom
-        files_fdom *= run_name*suffix
     end
+
+
+    println("Calling Paraview...")
+    files_fdom = joinpath(save_path, run_name*file_suffixes[1])
+    if length(file_suffixes)>1
+        for suffix in file_suffixes[2:end]
+            global files_fdom
+            files_fdom *= run_name*suffix
+        end
+    end
+
+    # Call Paraview
+    run(`paraview --data=$(files)`)
+
 end
-
-# Call Paraview
-run(`paraview --data=$(files)`)
-
-
