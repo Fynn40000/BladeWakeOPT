@@ -28,6 +28,7 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                                 x_bound_max     = 1,                    # maximum bounds in x-direction (bound_factor*2*R in meters)
                                 y_bound_max     = 0.5,                  # maximum bounds in y-direction (bound_factor*2*R in meters)
                                 z_bound_max     = 0.5,                  # maximum bounds in z-direction (bound_factor*2*R in meters)
+                                cylindrical_grid= false,                # is the grid a cylindrical grid?
                                 # ----- VPM OPTIONS ----------------    
                                 maxsigma        = nothing,              # Particles larger than this get shrunk to this size (this helps speed up computation)
                                 maxmagGamma     = Inf,                  # Any vortex strengths larger than this get clipped to this value
@@ -56,13 +57,33 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
 
   # Grid
   L               = R                                               # (m) reference length = rotor tip radius
-  dx, dy, dz      = L/x_resolution, L/y_resolution, L/z_resolution  # (m) cell size in each direction
-  Pmin            = 2*L*[x_bound_min, y_bound_min, z_bound_min]     # (m) minimum bounds (bound_factor * rotor diameter)
-  Pmax            = 2*L*[x_bound_max, y_bound_max, z_bound_max]     # (m) maximum bounds (bound_factor * rotor diameter)
-  NDIVS           = ceil.(Int, (Pmax .- Pmin)./[dx, dy, dz])        # Number of cells in each direction
+  
+
+  if cylindrical_grid
+    spacetransform  = uns.gt.cylindrical3D
+    O               = zeros(3)                                        # translation and re-orientation to the given origin and orientation  
+    Oaxis           = uns.gt.rotation_matrix2(0, -90, AOA)            # Orientation of grid (flip the grid aroud and locate it behind the turbine in x direction)
+
+    Pmin            = [L*x_bound_min, 0.0, L*z_bound_min]
+    Pmax            = [L*x_bound_max, 2*pi, L*z_bound_max]
+    dradial_annulus, dpolar_angle, dplane = L/x_resolution, y_resolution, L/z_resolution
+    NDIVS           = ceil.(Int, [(Pmax[1] - Pmin[1])/dradial_annulus, dpolar_angle, (Pmax[3] - Pmin[3])/dplane])
+
+  else
+    spacetransform  = nothing
+    O               = zeros(3)                                        # translation and re-orientation to the given origin and orientation  
+    Oaxis           = uns.gt.rotation_matrix2(0, 0, AOA)              # Orientation of grid
+
+    Pmin            = 2*L*[x_bound_min, y_bound_min, z_bound_min]     # (m) minimum bounds (bound_factor * rotor diameter)
+    Pmax            = 2*L*[x_bound_max, y_bound_max, z_bound_max]     # (m) maximum bounds (bound_factor * rotor diameter)
+    dx, dy, dz      = L/x_resolution, L/y_resolution, L/z_resolution  # (m) cell size in each direction
+    NDIVS           = ceil.(Int, (Pmax .- Pmin)./[dx, dy, dz])        # Number of cells in each direction
+
+  end
+  
   nnodes          = prod(NDIVS .+ 1)                                # Total number of nodes
 
-  Oaxis           = uns.gt.rotation_matrix2(0, 0, AOA)                  # Orientation of grid
+  
   
 
   # VPM settings
@@ -114,9 +135,12 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   for these_nums in threaded_nums[nthread:nthread]
     Xdummy = zeros(3)
     U = t->Vinf(Xdummy, t)
-    uns.computefluiddomain(Pmin, Pmax, NDIVS,
+    #uns.computefluiddomain(Pmin, Pmax, NDIVS,
+    computefluiddomain(Pmin, Pmax, NDIVS,
                            maxparticles,
                            these_nums, r_path, pfield_prefix;
+                           spacetransform=spacetransform,
+                           O=O,
                            Oaxis=Oaxis,
                            fmm=fmm,
                            pfield_optargs=[:Uinf => U],

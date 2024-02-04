@@ -26,13 +26,16 @@ using .OwnFunctions                                                             
 
 # Folders and paths
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", "NREL5MW_turbine_simulation")   # Folder of simulation to be evaluated
-run_name = "NREL5MW_turbine_simulation"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
-folder_name_fluiddomain = run_name*"-lowfid_15Revs_ev2nd_tstep"                                                              # Give the postprocessed fluid domain a name. 
+sim_name = "NREL5MW_turbine_simulation"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+folder_name_fluiddomain = sim_name*"-lowfid_15Revs_ev2nd_tstep"                                                              # Give the postprocessed fluid domain a name. 
                                                                                                                              # => This will be the name of the folder all fluiddomain files will be stored in.
-save_path = joinpath(this_file_path, "data_out", folder_name_fluiddomain)                                                    # Folder to store postprocessed fluiddomain files in
+save_path_fdom = joinpath(this_file_path, "data_out", folder_name_fluiddomain)                                                    # Folder to store postprocessed fluiddomain files in
 
 
-call_paraview = false                                                              # call paraview after postprocessing
+call_paraview = true                                                              # call paraview after postprocessing
+if @isdefined paraview                                                            # overwrite the call_paraview variable if this scrips gets executed via the single turbine simulation script
+    call_paraview = paraview
+end
 
 # turbine tip radius in (m)
 R = 63.0
@@ -67,6 +70,7 @@ x_b_max_for_x_y = 10
 y_b_max_for_x_y = 0.7
 
 # x-y grid boundaries of y-z-plane (=> factor*2*R in meters) => Hub = coordinate origin
+cylindrical_grid = true     # if true, a cylindrical grid with the size of the turbine radius is calculated
 y_b_min_for_y_z = -0.7
 z_b_min_for_y_z = -0.7
 y_b_max_for_y_z = 0.7
@@ -110,9 +114,9 @@ if calc_grid_x_y
         else
             first_fdom = false
         end
-        OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, tsteps;
+        OwnFunctions.postprocess_fluiddomain(simulation_path, sim_name, file_suffix, R, AOA, tsteps;
                                              # ----- OPTIONAL ARGUMENTS ----------
-                                             save_path       = save_path,               # folder to store data in (if nothing, data will be stored under simulation_path)
+                                             save_path       = save_path_fdom,               # folder to store data in (if nothing, data will be stored under simulation_path)
                                              # ----- FREESTREAM VELOCITY ---------
                                              Vinf            = Vinf,
                                              # ----- GRID OPTIONS ----------------  
@@ -142,15 +146,38 @@ if calc_grid_y_z
         vol_thickness = 0                         # plane thickness in meters => set this value to 0 to get a 2D solution (plane)
         gridsize_m = gridsize_y_z                 # grid size in meters => 0.5 equals 0.5m
 
-        # grid resolution
-        x_res = 1
-        y_res = R*(1/gridsize_m)
-        z_res = R*(1/gridsize_m)
-        # grid minimum boundaries (bound_factor*2*R in meters)
-        x_b_min = (-(vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
-        # grid maximum boundaries (bound_factor*2*R in meters)
-        x_b_max = ((vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
 
+
+        if cylindrical_grid
+            # NOTE: The plane is created in the x_y plane first, then rotated into the y-z plane
+                  # => therefore the x_loc is used to define the z boundaries (location in the z plane) and then rotated to -90 deg around the y axis
+            
+            # grid resolution
+            x_res = R*(1/gridsize_m)
+            y_res = 49                                                # Angular Step = 360/y_res in (°) !!!For some reason an error occurs when y_res >= 50!!! Nice would be: y_res = 2*pi*R*(1/gridsize_m) to have the minimum gridsize at the outer cylindrical plane section
+            z_res = R*(1/gridsize_m)                                  # THIS WILL DO NOTHING IF vol_thickness == 0 (meaning z_b_min==z_b_max)
+            # grid minimum boundaries (bound_factor*2*R in meters)
+            x_b_min = 0.0
+            #y_b_min_for_y_z = 0.0
+            z_b_min_for_y_z = (-(vol_thickness/2)/(2*R))+x_loc
+            # grid maximum boundaries (bound_factor*2*R in meters)
+            x_b_max = 1.0
+            #y_b_max_for_y_z = 2*pi
+            z_b_max_for_y_z = ((vol_thickness/2)/(2*R))+x_loc
+            
+
+    
+          else
+            # grid resolution
+            x_res = 1
+            y_res = R*(1/gridsize_m)
+            z_res = R*(1/gridsize_m)
+            # grid minimum boundaries (bound_factor*2*R in meters)
+            x_b_min = (-(vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
+            # grid maximum boundaries (bound_factor*2*R in meters)
+            x_b_max = ((vol_thickness/2)/(2*R))+x_loc # choose volume that has a thickness of vol_thickness meter in the x-dimension (-0.5m before x_loc and +0.5m behind x_loc)
+
+          end
 
         # calculate the plane
         if length(file_suffixes) == 1
@@ -158,9 +185,9 @@ if calc_grid_y_z
         else
             first_fdom = false
         end
-        OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, tsteps;
+        OwnFunctions.postprocess_fluiddomain(simulation_path, sim_name, file_suffix, R, AOA, tsteps;
                                              # ----- OPTIONAL ARGUMENTS ----------
-                                             save_path       = save_path,               # folder to store data in (if nothing, data will be stored under simulation_path)
+                                             save_path       = save_path_fdom,               # folder to store data in (if nothing, data will be stored under simulation_path)
                                              # ----- FREESTREAM VELOCITY ---------
                                              Vinf            = Vinf,
                                              # ----- GRID OPTIONS ----------------  
@@ -173,6 +200,7 @@ if calc_grid_y_z
                                              x_bound_max     = x_b_max,                 # maximum bounds in x-direction (bound_factor*2*R in meters)
                                              y_bound_max     = y_b_max_for_y_z,         # maximum bounds in y-direction (bound_factor*2*R in meters)
                                              z_bound_max     = z_b_max_for_y_z,         # maximum bounds in z-direction (bound_factor*2*R in meters)
+                                             cylindrical_grid=cylindrical_grid,         # a cylindrical grid will be calculated if true
                                              prompt          = false,
                                              verbose         = true,
                                              debug           = false,                   # saves fdom grid as a file
@@ -200,15 +228,16 @@ if call_paraview
 
 
     println("Calling Paraview...")
-    files_fdom = joinpath(save_path, run_name*file_suffixes[1])
+    files_fdom = joinpath(save_path_fdom, sim_name*file_suffixes[1])
     if length(file_suffixes)>1
         for suffix in file_suffixes[2:end]
             global files_fdom
-            files_fdom *= run_name*suffix
+            files_fdom *= sim_name*suffix
         end
     end
+    println(files_fdom)
 
     # Call Paraview
-    run(`paraview --data=$(files)`)
+    run(`paraview --data=$(files_fdom)`)
 
 end
