@@ -19,20 +19,20 @@ start_simulation_path = splitdir(@__FILE__)[1]
 include(joinpath(start_simulation_path, "..", "functions", "OwnFunctions.jl"))  # Read file with module definition first
 using .OwnFunctions                                                             # Include all self defined functions
 
-run_name        = "NREL5MW_turbine_simulation"                                  # Name of this simulation
+run_name        = "NREL-5MW_45Revs_50BE_72steps"                                  # Name of this simulation
 save_path       = joinpath(start_simulation_path, "data_out", run_name)         # Where to save this simulation           
 save_path_post  = joinpath(save_path, "postprocessing")                         # Where to save postprocessing plots
 
 # ----------------- Fidelity Options --------------------------------------------------------
 
-fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 4#36                      # number of revolutions to run => defines the length of the simulation
+fidelity        = "mid"                     # options: "low", "mid", "high"
+run_length      = 45                        # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 postprocessing  = true                      # perform postprocessing in general???
 paraview        = false                     # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
-postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
+postprocess_fdom= true                      # postprocess the fluid domains last timestep and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
 show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
 postprocess_all_tsteps_fdom = true          # postprocess all timesteps of the fluid domain?
@@ -85,7 +85,7 @@ aoa_bounds = Array{Float64, 2}(aoa_bounds)
 
 # Operating conditions
 RPM             = 12.1                      # RPM
-J               = 11.4/((RPM/60)*2*R)#0       # Advance ratio Vinf/(nD)
+J               = 11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
 AOA             = 0.0                       # (deg) Angle of attack (incidence angle)
 
 rho             = 1.225                     # (kg/m^3) air density

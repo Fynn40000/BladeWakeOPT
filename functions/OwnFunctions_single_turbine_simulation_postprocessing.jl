@@ -739,8 +739,8 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
     O               = zeros(3)                                        # translation and re-orientation to the given origin and orientation  
     Oaxis           = uns.gt.rotation_matrix2(0, -90, AOA)            # Orientation of grid (flip the grid aroud and locate it behind the turbine in x direction)
 
-    Pmin            = [L*x_bound_min, 0.0, L*z_bound_min]
-    Pmax            = [L*x_bound_max, 2*pi, L*z_bound_max]
+    Pmin            = [L*x_bound_min, 0.0, 2*L*z_bound_min]
+    Pmax            = [L*x_bound_max, 2*pi, 2*L*z_bound_max]
     dradial_annulus, dpolar_angle, dplane = L/x_resolution, y_resolution, L/z_resolution
     NDIVS           = ceil.(Int, [(Pmax[1] - Pmin[1])/dradial_annulus, dpolar_angle, (Pmax[3] - Pmin[3])/dplane])
 
