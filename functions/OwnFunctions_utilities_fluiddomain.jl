@@ -148,16 +148,9 @@ function computefluiddomain(pfield::vpm.ParticleField,
     # Add freestream
     if add_Uinf
         Uinf::Array{<:Real, 1} = pfield.Uinf(pfield.t)
-        P_counter = 0
-        P_sum = 0
         for P in vpm.iterate(pfield; start_i=np+1)
             P.U .+= Uinf
-            P_counter = P_counter + 1
-            P_sum = P_sum .+ P.U
         end
-        println("Average of velocities:")
-        avg = P_sum ./ P_counter
-        println("$(avg)\n")
     end
 
     # Evaluate RBF-approximated W
@@ -249,7 +242,7 @@ function computefluiddomain(pfield::vpm.ParticleField,
                 #println("avg distr Uz= $(Uz_avg_distr)")
 
                 if save_path != nothing
-                    fname = joinpath(save_path, "wake_velocity_profile_atx$(x_loc)D.$(pfield.t).csv")                # file path to store data in
+                    fname = joinpath(save_path, "wake_velocity_profile_atx$(Int(x_loc))m.$(Int(pfield.t)).csv")                # file path to store data in
 
                     Ux_avg_vec = zeros(num_radial_pos)
                     Uy_avg_vec = zeros(num_radial_pos)
@@ -536,6 +529,9 @@ function computefluiddomain(P_min, P_max, NDIVS, args...;
         x_loc = grid.nodes[3,1] # !!! This only works and represents the x location when a 2D plane is calculated and dz = 0
                                 # The z location represents in fact the x location because the plane is rotated around the y axis by -90°
         #println("radial_pos = $(radial_pos)")
+    else
+        radial_pos = nothing
+        x_loc = nothing
     end
 
     # Apply space transformation

@@ -46,12 +46,13 @@ AOA             = 0.0                                                           
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0]                                # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "manual"                                                         # (Options: "manual", "all") tstep_method defines the timesteps to be calculated
+tstep_method    = "manual"                                                         # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
                                                                                    # => when "manual", jump to next section and specify the timesteps to be evaluated manually
-# => following variables are necessary when using tstep_method = "all"
+# => following variables are necessary when using tstep_method = "all" or "last_Rev"
 nrevs           = 15                                                               # number of revolutions the simulation was simulated with
 nsteps_per_rev  = 36                                                               # number of steps per revolution the simulation was simulated with
 stepwidth       = 2                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+n_lastRevs      = 1                                                                # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
 
 # grid to be calculated
 calc_grid_x_y   = true
@@ -83,6 +84,11 @@ if tstep_method == "manual"
 
     tsteps = [10,15,20] # set by specific timesteps
     #tsteps = collect(1:2:10)      # set by own start, step and end time step (start:step:end)
+
+elseif tstep_method == "last_Rev"
+    nsteps = nrevs*nsteps_per_rev # Number of time steps
+    nsteps_start = nsteps - n_lastRevs*nsteps_per_rev
+    tsteps = collect(nsteps_start-1:stepwidth:nsteps-1)
 
 elseif tstep_method == "all"
     nsteps = nrevs*nsteps_per_rev # Number of time steps

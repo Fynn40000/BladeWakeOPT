@@ -473,3 +473,5 @@ if postprocessing
 
     
 end
+
+println("\n\nSIMULATION DONE!\nPROCESS EXITED NORMALLY!")

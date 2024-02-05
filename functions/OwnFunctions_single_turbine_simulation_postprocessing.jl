@@ -249,7 +249,7 @@ end
 "
 Postprocesses and plots the blade loads of a single turbines simulation.
 "
-function postorocess_blade_loading(save_path::String, save_path_post::String, run_name::String, R::Float64; 
+function postprocess_blade_loading(save_path::String, save_path_post::String, run_name::String, R::Float64; 
                             file_marker::String="_vlm", rev_to_average_idx=1, 
                             nrevs_to_average=1, 
                             num_elements::Int64=1, 

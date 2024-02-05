@@ -28,7 +28,7 @@ rotor_file      = "NREL5MW.csv"                                                 
 data_path       = joinpath(start_simulation_path, "..", "..", "00_database")        # Path to rotor database
 
 # => SIMULATION LENGTH SETTINGS:
-nrevs           = 1                                                                # Number of revolutions to run
+nrevs           = 4                                                                # Number of revolutions to run
 nsteps_per_rev  = 36                                                                # Number of steps per revolution
 
 # => FIDELITY PARAMETERS:
@@ -52,7 +52,7 @@ show_bladeload_plots    = false                                                 
 postprocess_fdom        = true                                                      # Postprocess the fluid domain and calculate velocity field of the last timestep?
 paraview                = false                                                     # Whether to visualize with Paraview 
                                                                                     # (if true, the parameter study will stop after each turbine simulation...)
-cylindrical_grid        = true,                                                     # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+cylindrical_grid        = true                                                      # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                     # this grid will be set automatically with the turbine diameter as its diameter
 
 # => OTHER:
