@@ -52,10 +52,11 @@ show_bladeload_plots    = false                                                 
 postprocess_fdom        = true                                                      # Postprocess the fluid domain and calculate velocity field of the last timestep?
 paraview                = false                                                     # Whether to visualize with Paraview 
                                                                                     # (if true, the parameter study will stop after each turbine simulation...)
-
+cylindrical_grid        = true,                                                     # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                                                                    # this grid will be set automatically with the turbine diameter as its diameter
 
 # => OTHER:
-p_per_step      = 4                                                                 # Particles shed per step
+p_per_step      = 2#4                                                                 # Particles shed per step
 
 
 # ----------------- START PARAMETERSTUDY ---------------------------------------------------
@@ -100,7 +101,9 @@ for i in parameters
                                     plot_bladeloads         = plot_bladeloads,
                                     show_bladeload_plots    = show_bladeload_plots,
                                     postprocess_fdom        = postprocess_fdom,
-                                    paraview                = paraview
+                                    paraview                = paraview,
+                                    cylindrical_grid        = cylindrical_grid              # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                                                                            # this grid will be set automatically with the turbine diameter as its diameter
                                     )
 
     elapsed_time_s = time() - start_time

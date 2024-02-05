@@ -1,6 +1,6 @@
 #=##############################################################################
 # DESCRIPTION
-    Simulation of a single wind turbine rotor.
+    Simulation of a single wind turbine rotor by using a function with several input options.
     This function can be called via another script and enables the evaluation of different turbine geometries and/or 
     parameterstudies regarding the simulation fidelity.
     This function is based on the file 01_single_turbine_simulation/single_turbine_simulation.jl
@@ -29,15 +29,17 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          rho             =    1.225,
                                          mu              =    1.81e-5,
                                          speedofsound    =    342.35,
-                                         p_per_step      =    2,                    # Sheds per time step
-                                         fidelity_extension      =    "high",        # options: "low", "mid", "high"
+                                         p_per_step      =    2,                        # Sheds per time step
+                                         fidelity_extension      =    "high",           # options: "low", "mid", "high"
                                          # => POSTPROCESSING AND VISUALIZATION
                                          postprocessing          = true,
                                          debug                   = true,
                                          plot_bladeloads         = true,
                                          show_bladeload_plots    = false,
                                          postprocess_fdom        = true,
-                                         paraview                = false
+                                         paraview                = false,
+                                         cylindrical_grid        = true     # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                                                                        # this grid will be set automatically with the turbine diameter as its diameter
                                          )
 
 
@@ -399,7 +401,9 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                                             debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
                                                             suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
                                                             gridsize_x_y=0.25,                     # grid size of x-y fluid domain plane in meters
-                                                            gridsize_y_z=0.25                      # grid size of y-z fluid domain plane in meters
+                                                            gridsize_y_z=0.25,                     # grid size of y-z fluid domain plane in meters
+                                                            cylindrical_grid = cylindrical_grid,   # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                                                                                   # this grid will be set automatically with the turbine diameter as its diameter
                                                             )
 
     # ----------------- 7) VISUALIZATION -------------------------------------------

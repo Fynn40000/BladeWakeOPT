@@ -26,16 +26,16 @@ save_path_post  = joinpath(save_path, "postprocessing")                         
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 2#36                      # number of revolutions to run => defines the length of the simulation
+run_length      = 4#36                      # number of revolutions to run => defines the length of the simulation
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 postprocessing  = true                      # perform postprocessing in general???
-paraview        = true                     # Whether to visualize with Paraview
+paraview        = false                     # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domain and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
 show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
-postprocess_all_tsteps_fdom = false         # postprocess all timesteps of the fluid domain?
+postprocess_all_tsteps_fdom = true          # postprocess all timesteps of the fluid domain?
                                             # => NOTE: if true, you need to set up the script that gets called 
                                             #          via this file with your desired inputs (see "6) POSTPROCESSING")
 
@@ -130,7 +130,7 @@ ttot            = nsteps/nsteps_per_rev / (RPM/60)       # (s) total simulation 
 
 # VPM particle shedding
 if fidelity == "low"
-    p_per_step      = 4                      # Sheds per time step
+    p_per_step      = 2                      # Sheds per time step
     shed_starting   = false                  # Whether to shed starting vortex
 elseif fidelity == "mid"
     p_per_step      = 2

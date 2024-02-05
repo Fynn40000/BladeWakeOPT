@@ -46,7 +46,7 @@ AOA             = 0.0                                                           
 Vinf(X, t)      = magVinf*[cosd(AOA), sind(AOA), 0]                                # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "manual"                                                            # tstep_method defines the timesteps to be calculated (Options: "manual", "all")
+tstep_method    = "manual"                                                         # (Options: "manual", "all") tstep_method defines the timesteps to be calculated
                                                                                    # => when "manual", jump to next section and specify the timesteps to be evaluated manually
 # => following variables are necessary when using tstep_method = "all"
 nrevs           = 15                                                               # number of revolutions the simulation was simulated with
@@ -55,7 +55,7 @@ stepwidth       = 2                                                             
 
 # grid to be calculated
 calc_grid_x_y   = true
-calc_grid_y_z   = false
+calc_grid_y_z   = true
 
 gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
@@ -69,8 +69,8 @@ y_b_min_for_x_y = -0.7
 x_b_max_for_x_y = 10                 
 y_b_max_for_x_y = 0.7
 
-# x-y grid boundaries of y-z-plane (=> factor*2*R in meters) => Hub = coordinate origin
-cylindrical_grid = true     # if true, a cylindrical grid with the size of the turbine radius is calculated
+# y-z grid boundaries of y-z-plane (=> factor*2*R in meters) => Hub = coordinate origin
+cylindrical_grid = true     # if true, a cylindrical grid with the size of the turbine radius is calculated (disregards the following variables)
 y_b_min_for_y_z = -0.7
 z_b_min_for_y_z = -0.7
 y_b_max_for_y_z = 0.7
