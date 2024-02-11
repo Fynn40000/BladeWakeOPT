@@ -25,8 +25,9 @@ using .OwnFunctions                                                             
 # ----------------- 0) SPECIFY SIMULATION TO BE POSTPROCESSED AND FOLDER TO STORE DATA IN ------
 
 # Folders and paths
-simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", "NREL-5MW_45Revs_50BE_72steps")   # Folder of simulation to be evaluated
-sim_name = "NREL-5MW_45Revs_50BE_72steps"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")                                                # Folder to store postprocessed fluiddomain files in
+sim_name = "NREL-5MW_10Revs_50BE_360steps"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", sim_name)   # Folder of simulation to be evaluated
+
 
 call_paraview = true                                                              # call paraview after postprocessing
 
@@ -39,17 +40,17 @@ AOA_fdom        = 0.0                                                           
 Vinf_fdom(X, t)      = magVinf_fdom*[cosd(AOA_fdom), sind(AOA_fdom), 0]            # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "last_Rev"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
+tstep_method    = "manual"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
 
 # => when "manual", these timesteps will be calculated
-tsteps_manual = [10,15,20]                                                         # set by specific timesteps manually chosen by the user
-#tsteps:manual = collect(1:2:10)                                                   # set by own start, step and end time (start:step:end)
+#tsteps_manual = [2379]                                                         # set by specific timesteps manually chosen by the user
+tsteps_manual = collect(2020:10:2380)                                                   # set by own start, step and end time (start:step:end)
 
 # => following variables are necessary when using tstep_method = "all" or "last_Rev"
-nrevs_fdom      = 45                                                               # number of revolutions the simulation was simulated with
-nsteps_per_rev_fdom  = 72                                                          # number of steps per revolution the simulation was simulated with
-stepwidth       = 6                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
-n_lastRevs      = 22                                                               # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
+nrevs_fdom      = 6.6                                                               # number of revolutions the simulation was simulated with
+nsteps_per_rev_fdom  = 360                                                          # number of steps per revolution the simulation was simulated with
+stepwidth       = 10                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+n_lastRevs      = 1                                                               # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
 
 # grid to be calculated
 calc_grid_x_y   = true
@@ -59,7 +60,7 @@ gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
 
 z_locs          = [0]                                   # z coordinate location of x-y-plane = z_loc*2*Radius in meters
-x_locs          = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
+x_locs          = [0.5, 1, 1.5, 2]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
 
 # x-y grid boundaries of x-y-plane (=> factor*2*Radius in meters) => Hub = coordinate origin
 x_b_min_for_x_y = -0.2
@@ -111,6 +112,17 @@ if @isdefined nsteps_per_rev
     nsteps_per_rev_fdom = nsteps_per_rev
 end
 
+if @isdefined all_tstep_method
+    tstep_method = all_tstep_method
+end
+
+if @isdefined all_tstep_stepwidth
+    stepwidth = all_tstep_stepwidth
+end
+
+if @isdefined all_tstep_n_lastRevs
+    n_lastRevs = all_tstep_n_lastRevs
+end
 
 # set the foldername and save path automatically
     # Give the postprocessed fluid domain a name. 

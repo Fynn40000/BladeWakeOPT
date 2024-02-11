@@ -48,7 +48,10 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
                                     nsteps_plot=1,
                                     nsteps_savefig=10,
                                     colors="rgbcmy"^100,
-                                    stls="o^*.px"^100, )
+                                    stls="o^*.px"^100, 
+                                    cut_wake_mode="plane",
+                                    cut_wake_loc=[0,0,0] 
+                                    )
 
     fcalls = 0                  # Number of function calls
 
@@ -59,7 +62,7 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
 
     # Call figure
     if disp_conv
-        formatpyplot()
+        uns.formatpyplot()
         fig = plt.figure(figname, figsize=[7*3, 5*2]*figsize_factor)
         axs = fig.subplots(2, 3)
         axs = [axs[6], axs[2], axs[4], axs[1], axs[3], axs[5]]
@@ -69,10 +72,10 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
     end
     
     # Function for run_vpm! to call on each iteration
-    function extra_runtime_function(sim::Simulation{V, M, R},
+    function extra_runtime_function(sim::uns.Simulation{V, M, R},
                                     PFIELD::vpm.ParticleField,
                                     T::Real, DT::Real; optargs...
-                                   ) where{V<:AbstractVLMVehicle, M, R}
+                                   ) where{V<:uns.AbstractVLMVehicle, M, R}
 
         # rotors = vcat(sim.vehicle.rotor_systems...)
         angle = T*360*RPM_ref/60
@@ -227,6 +230,10 @@ function generate_monitor_turbines( rotors::Array{vlm.Rotor, 1},
             print(f, "\n")
             close(f)
         end
+
+
+        # chop wake
+        chopWake!(PFIELD, cut_wake_mode, cut_wake_loc;)
 
         fcalls += 1
 
