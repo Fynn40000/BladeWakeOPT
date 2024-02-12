@@ -40,16 +40,16 @@ AOA_fdom        = 0.0                                                           
 Vinf_fdom(X, t)      = magVinf_fdom*[cosd(AOA_fdom), sind(AOA_fdom), 0]            # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "manual"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
+tstep_method    = "last_Rev"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
 
 # => when "manual", these timesteps will be calculated
 #tsteps_manual = [2379]                                                         # set by specific timesteps manually chosen by the user
 tsteps_manual = collect(2020:10:2380)                                                   # set by own start, step and end time (start:step:end)
 
 # => following variables are necessary when using tstep_method = "all" or "last_Rev"
-nrevs_fdom      = 6.6                                                               # number of revolutions the simulation was simulated with
-nsteps_per_rev_fdom  = 360                                                          # number of steps per revolution the simulation was simulated with
-stepwidth       = 10                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+nrevs_fdom      = 40                                                               # number of revolutions the simulation was simulated with
+nsteps_per_rev_fdom  = 72                                                          # number of steps per revolution the simulation was simulated with
+stepwidth       = 6                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
 n_lastRevs      = 1                                                               # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
 
 # grid to be calculated
@@ -60,12 +60,12 @@ gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
 
 z_locs          = [0]                                   # z coordinate location of x-y-plane = z_loc*2*Radius in meters
-x_locs          = [0.5, 1, 1.5, 2]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
+x_locs          = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
 
 # x-y grid boundaries of x-y-plane (=> factor*2*Radius in meters) => Hub = coordinate origin
 x_b_min_for_x_y = -0.2
 y_b_min_for_x_y = -0.7
-x_b_max_for_x_y = 11                 
+x_b_max_for_x_y = 13                 
 y_b_max_for_x_y = 0.7
 
 # y-z grid boundaries of y-z-plane (=> factor*2*Radius in meters) => Hub = coordinate origin

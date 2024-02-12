@@ -95,6 +95,7 @@ for i in parameters
                                     speedofsound    =   speedofsound,
                                     p_per_step      =   p_per_step,
                                     fidelity_extension      =   "high",                     # options: "low", "mid", "high"
+                                    x_loc           = 12,                                   # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
                                     # => POSTPROCESSING AND VISUALIZATION
                                     postprocessing          = postprocessing,
                                     debug                   = debug,

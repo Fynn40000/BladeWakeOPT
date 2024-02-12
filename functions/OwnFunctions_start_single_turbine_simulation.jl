@@ -31,6 +31,8 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          speedofsound    =    342.35,
                                          p_per_step      =    2,                        # Sheds per time step
                                          fidelity_extension      =    "high",           # options: "low", "mid", "high"
+                                         cut_wake_mode   = "plane",                     # cut all particles away 
+                                         x_loc           = 10,                          # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
                                          # => POSTPROCESSING AND VISUALIZATION
                                          postprocessing          = true,
                                          debug                   = true,
@@ -328,6 +330,7 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
 
   # Generate turbine monitor
   println("    Generating monitor...")
+  #=
   monitor_rotor = uns.generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx, turbine_flag;
                                               t_scale=RPM/60,        # Scaling factor for time in plots
                                               t_lbl="Revolutions",   # Label for time axis
@@ -337,6 +340,18 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                               run_name=run_name,
                                               figname="turbine monitor",
                                               )
+=#
+monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx, turbine_flag;
+                                            t_scale=RPM/60,        # Scaling factor for time in plots
+                                            t_lbl="Revolutions",   # Label for time axis
+                                            out_figs=figs,
+                                            out_figaxs=figaxs,
+                                            save_path=save_path,
+                                            run_name=run_name,
+                                            figname="turbine monitor",
+                                            cut_wake_mode=cut_wake_mode,
+                                            cut_wake_loc=[1/(2*R*x_loc), 0, 0]
+                                            )
 
   # ------------- 5) RUN SIMULATION ----------------------------------------------
   println("    Running simulation...")

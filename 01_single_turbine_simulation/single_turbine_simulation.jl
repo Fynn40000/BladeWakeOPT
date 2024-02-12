@@ -23,25 +23,26 @@ turbine_name    = "NREL-5MW"
 
 # ----------------- Fidelity Options --------------------------------------------------------
 
-fidelity        = "low"                     # options: "low", "mid", "high"
-run_length      = 6#45                        # number of revolutions to run => defines the length of the simulation
+fidelity        = "mid"                     # options: "low", "mid", "high"
+run_length      = 40                        # number of revolutions to run => defines the length of the simulation
 
 cut_wake_mode   = "plane"                   # cut all particles away 
-x_loc           = 12                        # x location from wich on the particles will be cut away
+x_loc           = 12                        # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 postprocessing  = true                      # perform postprocessing in general???
-paraview        = true                     # Whether to visualize with Paraview
+paraview        = false                     # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
 postprocess_fdom= true                      # postprocess the fluid domains last timestep and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
 show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
-postprocess_all_tsteps_fdom = false          # postprocess all timesteps of the fluid domain?
+postprocess_all_tsteps_fdom = true          # postprocess all timesteps of the fluid domain?
                                             # => NOTE: if true, you need to set up the script that gets called 
                                             #          via this file with your desired inputs (see "6) POSTPROCESSING")
-all_tstep_method = "last_Rev"
-all_tstep_stepwidth = 6
-all_tstep_n_lastRevs = 1
+
+all_tstep_method = "last_Rev"               # method to use when postprocessing several timesteps of the fluiddomain
+all_tstep_stepwidth = 72                     # take each ...th timestep
+all_tstep_n_lastRevs = 20                    # number of (last) revolutions that will be postprocessed
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
 
