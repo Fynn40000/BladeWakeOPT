@@ -28,12 +28,13 @@ rotor_file      = "NREL5MW.csv"                                                 
 data_path       = joinpath(start_simulation_path, "..", "..", "00_database")        # Path to rotor database
 
 # => SIMULATION LENGTH SETTINGS:
-nrevs           = 4                                                                # Number of revolutions to run
-nsteps_per_rev  = 36                                                                # Number of steps per revolution
+nrevs           = 33                                                                # Number of revolutions to run
+nsteps_per_rev  = 72                                                                # Number of steps per revolution
 
 # => FIDELITY PARAMETERS:
 #n               = 50                                                                # Number of blade elements per blade
-parameters      = collect(30:10:40)#collect(10:10:200)                                                # THIS IS THE ARRAY THAT CONTAINS THE VALUES OF THE PARAMETER THAT WILL BE VARIED!!!
+#parameters      = [20,30]#collect(30:10:40)#collect(10:10:200)                                                # THIS IS THE ARRAY THAT CONTAINS THE VALUES OF THE PARAMETER THAT WILL BE VARIED!!!
+parameters      = [20, 35, 50, 75, 100, 135, 170]
 
 # => OPERATING CONDITIONS:
 RPM             = 12.1                                                              # Rotational speed (1/min)
@@ -41,7 +42,7 @@ magVinf         = 11.4                                                          
 AOA             = 0.0                                                               # Angle of Attack (deg)
 
 rho             = 1.225                                                             # Air density (kg/m^3)
-mu              = 1.81e-5                                                           # Air dynamic viscosity (kg/ms)
+mu              = 1.789e-5                                                           # Air dynamic viscosity (kg/ms)
 speedofsound    = 342.35                                                            # Speed of sound (m/s)
 
 # => POSTPROCESSING AND VISUALIZATION
@@ -70,6 +71,8 @@ for i in parameters
     start_time = time()
     println("\n--------------------------------------------------------------------------------")
     println("--------------------------------------------------------------------------------")
+    println("--------------------------------------------------------------------------------")
+    println("--------------------------------------------------------------------------------")
     println("EVALUATING "*param_study_folderprefix*"_$(i) SIMULATION...")
 
     n = i # set the parameter to be varied
@@ -94,9 +97,10 @@ for i in parameters
                                     mu              =   mu,
                                     speedofsound    =   speedofsound,
                                     p_per_step      =   p_per_step,
-                                    fidelity_extension      =   "high",                     # options: "low", "mid", "high"
-                                    x_loc           = 12,                                   # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
+                                    fidelity_extension      =   "mid",                     # options: "low", "mid", "high"
+                                    x_loc           = 12,                                  # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
                                     # => POSTPROCESSING AND VISUALIZATION
+                                    dt_fdom                 = 2,                           # every ...th timestep of the last revolution is postprocessed (fluiddomain)
                                     postprocessing          = postprocessing,
                                     debug                   = debug,
                                     plot_bladeloads         = plot_bladeloads,
@@ -108,6 +112,11 @@ for i in parameters
                                     )
 
     elapsed_time_s = time() - start_time
+    # save time 
+    open(joinpath(save_path_temp, "00_elapsed_time.txt"), "w") do file
+      write(file, string(floor(elapsed_time_s)))
+    end
+
     elapsed_time_min = floor(elapsed_time_s/60)
     elapsed_time_s = elapsed_time_s - (60 * elapsed_time_min)
     elapsed_time_h = floor(elapsed_time_min/60)

@@ -80,6 +80,8 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     # calculate number of planes to postprocess 
     approx_x_range = magVinfx * sim_time
     x_max_calc = approx_x_range / (2*R)       # calculated maximum x boundary based on wind velocity and simulation time
+    # JUST FOR MY STUDIES: SET x_max_calc manually to 10
+    x_max_calc = 10
 
     # set time steps to be postprocessed via the postprocess_fluiddomain function
     timesteps_to_evaluate = tsteps
@@ -103,7 +105,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     y_b_min = -0.7
     z_b_min = (-(vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
     # grid maximum boundaries (bound_factor*2*R in meters)
-    x_b_max = x_max_calc#15
+    x_b_max = x_max_calc+1#15
     y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 

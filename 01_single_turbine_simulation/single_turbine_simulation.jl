@@ -24,7 +24,7 @@ turbine_name    = "NREL-5MW"
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "mid"                     # options: "low", "mid", "high"
-run_length      = 40                        # number of revolutions to run => defines the length of the simulation
+run_length      = 1                        # number of revolutions to run => defines the length of the simulation
 
 cut_wake_mode   = "plane"                   # cut all particles away 
 x_loc           = 12                        # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
@@ -36,7 +36,7 @@ plot_bladeloads = true                      # postprocess the blade loads and pl
 postprocess_fdom= true                      # postprocess the fluid domains last timestep and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
 show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
-postprocess_all_tsteps_fdom = true          # postprocess all timesteps of the fluid domain?
+postprocess_all_tsteps_fdom = false          # postprocess all timesteps of the fluid domain?
                                             # => NOTE: if true, you need to set up the script that gets called 
                                             #          via this file with your desired inputs (see "6) POSTPROCESSING")
 
@@ -412,7 +412,7 @@ uns.run_simulation(simulation, nsteps;
                     sigma_vlm_surf=sigma_rotor_surf,
                     sigma_rotor_surf=sigma_rotor_surf,
                     sigma_vpm_overwrite=sigma_vpm_overwrite,
-                    sigmafactor_vpmonvlm=sigmafactor_vpmonvlm,
+                    sigmafactor_vpmonvlm=sigmafactor_vpmonvlm, # (experimental) shrinks the particles by this factor when calculating VPM-on-VLM/Rotor induced velocities
                     vlm_vortexsheet = false, # Whether to spread surface circulation as a vortex sheet in the VPM (turns ASM on; ALM if false)
                     vlm_rlx=vlm_rlx, # VLM relaxation (>0.9 can cause divergence, <0.2 slows simulation too much, deactivated with <0)
                     hubtiploss_correction=hubtiploss_correction, # Hub and tip loss correction of rotors (ignored in quasi-steady solver)

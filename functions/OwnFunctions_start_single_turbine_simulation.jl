@@ -34,6 +34,7 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          cut_wake_mode   = "plane",                     # cut all particles away 
                                          x_loc           = 10,                          # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
                                          # => POSTPROCESSING AND VISUALIZATION
+                                         dt_fdom                 = 2,                   # every ...th timestep of the last revolution is postprocessed (fluiddomain)
                                          postprocessing          = true,
                                          debug                   = true,
                                          plot_bladeloads         = true,
@@ -385,8 +386,8 @@ monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx,
                       # ----- OUTPUT OPTIONS ------------------
                       prompt = false,
                       raisewarnings = false,
-                      verbose=false,
-                      verbose_nsteps = 50,
+                      verbose=true,
+                      verbose_nsteps = 10,
                       save_path=save_path,
                       run_name=run_name,
                       debug=debug,
@@ -412,7 +413,7 @@ monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx,
                                                             rev_to_average_idx=nrevs,              # Revolution to wich the postprocessing should be applied on
                                                             nrevs_to_average=1,                    # number of Revolutions to average for postprocessing the bladeloads
                                                             num_elements=n,                        # number of blade elements per blade
-                                                            tsteps = [nsteps-1],                   # time steps to be postprocessed
+                                                            tsteps = collect((nsteps_per_rev*(nrevs-1))-1:dt_fdom:(nsteps_per_rev*nrevs)-1),#[nsteps-1],                   # time steps to be postprocessed
                                                             debug=debug,                           # postprocess dimensionless coefficients too? => NOTE: debug statement must be set to true for uns.run_simulation. Otherwise the simulation files will not contain the coefficient data.
                                                             suppress_plots=!show_bladeload_plots,  # suppresses the plots to show up on the display
                                                             gridsize_x_y=0.25,                     # grid size of x-y fluid domain plane in meters
