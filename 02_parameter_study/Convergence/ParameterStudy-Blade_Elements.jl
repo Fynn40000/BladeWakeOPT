@@ -37,8 +37,8 @@ nsteps_per_rev  = 72                                                            
 parameters      = [20, 35, 50, 75, 100, 135, 170]
 
 # => OPERATING CONDITIONS:
-RPM             = 12.1                                                              # Rotational speed (1/min)
-magVinf         = 11.4                                                              # Free stream wind speed (m/s)
+RPM             = 12.1*8/11.4                                                              # Rotational speed (1/min)
+magVinf         = 8                                                                 # Free stream wind speed (m/s)
 AOA             = 0.0                                                               # Angle of Attack (deg)
 
 rho             = 1.225                                                             # Air density (kg/m^3)
@@ -107,12 +107,13 @@ for i in parameters
                                     show_bladeload_plots    = show_bladeload_plots,
                                     postprocess_fdom        = postprocess_fdom,
                                     paraview                = paraview,
-                                    cylindrical_grid        = cylindrical_grid              # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                    cylindrical_grid        = cylindrical_grid,              # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                             # this grid will be set automatically with the turbine diameter as its diameter
+                                    cylinder_radius         = 2                          # set the cylinder radius (factor*R)
                                     )
 
     elapsed_time_s = time() - start_time
-    # save time 
+    # save time
     open(joinpath(save_path_temp, "00_elapsed_time.txt"), "w") do file
       write(file, string(floor(elapsed_time_s)))
     end

@@ -24,7 +24,7 @@ turbine_name    = "NREL-5MW"
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "mid"                     # options: "low", "mid", "high"
-run_length      = 1                        # number of revolutions to run => defines the length of the simulation
+run_length      = 2                        # number of revolutions to run => defines the length of the simulation
 
 cut_wake_mode   = "plane"                   # cut all particles away 
 x_loc           = 12                        # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
@@ -89,8 +89,8 @@ aoa_bounds = Array{Float64, 2}(aoa_bounds)
 # ----------------- SIMULATION PARAMETERS --------------------------------------
 
 # Operating conditions
-RPM             = 12.1                      # RPM
-J               = 11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
+RPM             = 12.1*8/11.4#12.1                      # RPM
+J               = 8/((RPM/60)*2*R)#11.4/((RPM/60)*2*R)       # Advance ratio Vinf/(nD)
 AOA             = 0.0                       # (deg) Angle of attack (incidence angle)
 
 rho             = 1.225                     # (kg/m^3) air density
@@ -462,7 +462,8 @@ if postprocessing
                                                             gridsize_y_z=0.25,                     # grid size of y-z fluid domain plane in meters
                                                             cylindrical_grid = true,               # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                                    # this grid will be set automatically with the turbine diameter as its diameter
-                                                            verbose = false
+                                                            verbose = false,
+                                                            cylinder_radius = 2                    # set the cylinder radius (factor*R)
                                                             )
 
     # postprocess all timesteps via ths script and call paraview to visualize them...

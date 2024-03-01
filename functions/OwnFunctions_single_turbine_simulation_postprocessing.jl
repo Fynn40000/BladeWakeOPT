@@ -28,7 +28,8 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
                                                   gridsize_y_z::Float64=0.5,      # grid size of y-z fluid domain plane in meters
                                                   cylindrical_grid = false,       # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                   # this grid will be set automatically with the turbine diameter as its diameter
-                                                  verbose = true
+                                                  verbose = true,
+                                                  cylinder_radius = 2              # set the cylinder radius (factor*R)
                                                   )
 
   
@@ -154,7 +155,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
         #y_b_min = 0.0
         z_b_min = (-(vol_thickness/2)/(2*R))+x_loc
         # grid maximum boundaries (bound_factor*2*R in meters)
-        x_b_max = 1.0
+        x_b_max = cylinder_radius
         #y_b_max = 2*pi
         z_b_max = ((vol_thickness/2)/(2*R))+x_loc
 

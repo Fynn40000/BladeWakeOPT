@@ -41,8 +41,9 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          show_bladeload_plots    = false,
                                          postprocess_fdom        = true,
                                          paraview                = false,
-                                         cylindrical_grid        = true     # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
+                                         cylindrical_grid        = true,     # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                         # this grid will be set automatically with the turbine diameter as its diameter
+                                         cylinder_radius         = 2                          # set the cylinder radius (factor*R)
                                          )
 
 
@@ -420,6 +421,7 @@ monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx,
                                                             gridsize_y_z=0.25,                     # grid size of y-z fluid domain plane in meters
                                                             cylindrical_grid = cylindrical_grid,   # if true, the y-z plane will be calculated as a cylindrical grid and the wake velocity profiles will be saved within a .csv file
                                                                                                    # this grid will be set automatically with the turbine diameter as its diameter
+                                                            cylinder_radius = cylinder_radius
                                                             )
 
     # ----------------- 7) VISUALIZATION -------------------------------------------
