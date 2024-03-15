@@ -24,16 +24,16 @@ turbine_name    = "NREL-5MW"
 # ----------------- Fidelity Options --------------------------------------------------------
 
 fidelity        = "mid"                     # options: "low", "mid", "high"
-run_length      = 2                        # number of revolutions to run => defines the length of the simulation
+run_length      = 10#33                        # number of revolutions to run => defines the length of the simulation
 
 cut_wake_mode   = "plane"                   # cut all particles away 
 x_loc           = 12                        # x location from wich on the particles will be cut away (x coordinate = x_loc*2*R in meters)
 
 # ----------------- Postprocessing and Visualization ----------------------------------------
 postprocessing  = true                      # perform postprocessing in general???
-paraview        = false                     # Whether to visualize with Paraview
+paraview        = true                      # Whether to visualize with Paraview
 plot_bladeloads = true                      # postprocess the blade loads and plot the radial distribution
-postprocess_fdom= true                      # postprocess the fluid domains last timestep and calculate velocity field etc.
+postprocess_fdom= false#true                      # postprocess the fluid domains last timestep and calculate velocity field etc.
 debug           = true                      # enables calculation of coefficients such as cn, ct, cl, cd
 show_bladeload_plots = false                # show the bladeload plots on display after postprocessing?
 postprocess_all_tsteps_fdom = false          # postprocess all timesteps of the fluid domain?
@@ -41,7 +41,7 @@ postprocess_all_tsteps_fdom = false          # postprocess all timesteps of the 
                                             #          via this file with your desired inputs (see "6) POSTPROCESSING")
 
 all_tstep_method = "last_Rev"               # method to use when postprocessing several timesteps of the fluiddomain
-all_tstep_stepwidth = 72                     # take each ...th timestep
+all_tstep_stepwidth = 170#72                     # take each ...th timestep
 all_tstep_n_lastRevs = 20                    # number of (last) revolutions that will be postprocessed
 
 # ----------------- GEOMETRY PARAMETERS ----------------------------------------
@@ -125,7 +125,7 @@ nrevs           = run_length                # Number of revolutions in simulatio
 if fidelity == "low"
     nsteps_per_rev  = 36                    # Time steps per revolution
 elseif fidelity == "mid"
-    nsteps_per_rev  = 72
+    nsteps_per_rev  = 170#72
 elseif fidelity == "high"
     nsteps_per_rev  = 360
 end
@@ -449,6 +449,7 @@ if postprocessing
                                                             plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
                                                             postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                                             # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                            max_particles = max_particles,         # number of maximum particles
                                                             Vinf = Vinf,                           # Freestream Velocity
                                                             magVinfx = magVinfx,                   # Freestream Velocity in x direction
                                                             sim_time = ttot,                       # Overall (real) simulation time in seconds

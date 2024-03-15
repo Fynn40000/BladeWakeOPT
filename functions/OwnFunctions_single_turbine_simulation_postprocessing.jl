@@ -15,6 +15,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
                                                   plot_bladeloads::Bool=true,     # postprocessing the bladeloads?
                                                   postprocess_fdom::Bool=true,    # postprocessing the fluiddomain?
                                                   # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                  max_particles = max_particles,  # number of maximum particles
                                                   Vinf = (X, t)->zeros(3),        # Freestream Velocity
                                                   magVinfx = 1,                   # Freestream Velocity in x direction
                                                   sim_time = 1,                   # Overall (real) simulation time in seconds
@@ -113,6 +114,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
                                          # ----- FREESTREAM VELOCITY ---------
                                          Vinf            = Vinf,
+                                         ax_particles    = max_particles,         # number of maximum particles
                                          # ----- GRID OPTIONS ----------------  
                                          x_resolution    = x_res,                   # discretization of grid in x-direction
                                          y_resolution    = y_res,                   # discretization of grid in y-direction
@@ -180,6 +182,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
       OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
                                           # ----- FREESTREAM VELOCITY ---------
                                           Vinf            = Vinf,
+                                          ax_particles    = max_particles,         # number of maximum particles
                                           # ----- GRID OPTIONS ----------------  
                                           x_resolution    = x_res,                   # discretization of grid in x-direction
                                           y_resolution    = y_res,                   # discretization of grid in y-direction
@@ -694,6 +697,7 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
                                 nums::Vector{Int64};                    # Time steps to process
                                 # ----- OPTIONAL ARGUMENTS ----------
                                 save_path       = nothing,              # folder to store data in (if nothing, data will be stored under simulation_path)
+                                max_particles   = Int(1e6),                # Maximum number of particles
                                 # ----- FREESTREAM VELOCITY ---------
                                 Vinf            = (X, t)->zeros(3),
                                 # ----- GRID OPTIONS ----------------  
@@ -765,7 +769,7 @@ function postprocess_fluiddomain(# ---- ESSENTIAL ARGUMENTS ---------
   
 
   # VPM settings
-  maxparticles    = Int(1.0e6 + nnodes)                             # Maximum number of particles
+  maxparticles    = Int(max_particles + nnodes)#Int(2.0e6 + nnodes)#Int(1.0e6 + nnodes)                             # Maximum number of particles
   fmm             = uns.vpm.FMM(; p=4, ncrit=50, theta=0.4, phi=0.3)# FMM parameters (decrease phi to reduce FMM noise)
   scale_sigma     = 1.00                                            # Shrink smoothing radii by this factor
   f_sigma         = 0.5                                             # Smoothing of node particles as sigma = f_sigma*meansigma

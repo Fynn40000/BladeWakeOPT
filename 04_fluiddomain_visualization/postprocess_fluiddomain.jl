@@ -25,42 +25,47 @@ using .OwnFunctions                                                             
 # ----------------- 0) SPECIFY SIMULATION TO BE POSTPROCESSED AND FOLDER TO STORE DATA IN ------
 
 # Folders and paths
-sim_name = "NREL-5MW_10Revs_50BE_360steps"                                                                                      # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+sim_name = "NREL-5MW_10Revs_50BE_170steps"#"NREL5MW_BladeElement_75"#"NREL-5MW_33Revs_100BE_72steps"                                                                           # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", sim_name)   # Folder of simulation to be evaluated
 
 
-call_paraview = true                                                              # call paraview after postprocessing
+call_paraview = false                                                              # call paraview after postprocessing
 
 # turbine tip radius in (m)
 Radius = 63.0
 
 # Freestream reference wind speed
-magVinf_fdom    = 11.4                                                             # (m/s) Magnitude of free stream wind speed
+magVinf_fdom    = 8#11.4                                                             # (m/s) Magnitude of free stream wind speed
 AOA_fdom        = 0.0                                                              # (deg) Angle of attack (incidence angle)
 Vinf_fdom(X, t)      = magVinf_fdom*[cosd(AOA_fdom), sind(AOA_fdom), 0]            # wind speed in global coordinatesystem
 
 # Time steps to evaluate
-tstep_method    = "last_Rev"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
+tstep_method    = "manual"                                                       # (Options: "manual", "all", "last_Rev") tstep_method defines the timesteps to be calculated
 
 # => when "manual", these timesteps will be calculated
 #tsteps_manual = [2379]                                                         # set by specific timesteps manually chosen by the user
-tsteps_manual = collect(2020:10:2380)                                                   # set by own start, step and end time (start:step:end)
+tsteps_manual = collect(1529:2:1700)#collect(2302:2:2375)#collect(1749:2:1822)                                                   # set by own start, step and end time (start:step:end)
 
 # => following variables are necessary when using tstep_method = "all" or "last_Rev"
-nrevs_fdom      = 40                                                               # number of revolutions the simulation was simulated with
-nsteps_per_rev_fdom  = 72                                                          # number of steps per revolution the simulation was simulated with
+nrevs_fdom      = 10#33                                                               # number of revolutions the simulation was simulated with
+nsteps_per_rev_fdom  = 170#72                                                          # number of steps per revolution the simulation was simulated with
 stepwidth       = 6                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
 n_lastRevs      = 1                                                               # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
 
+B = 3 #blade number
+p_per_step = 2 # was always set to 2 during the studies (particle sheds per time step)
+n = 50#75
+max_particles_fdom   = ((2*n+1)*B)*nsteps_per_rev_fdom*nrevs_fdom*p_per_step + 1 # Maximum number of particles
+
 # grid to be calculated
-calc_grid_x_y   = true
+calc_grid_x_y   = false
 calc_grid_y_z   = true
 
 gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
 
 z_locs          = [0]                                   # z coordinate location of x-y-plane = z_loc*2*Radius in meters
-x_locs          = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
+x_locs          = [1, 4, 7, 9]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
 
 # x-y grid boundaries of x-y-plane (=> factor*2*Radius in meters) => Hub = coordinate origin
 x_b_min_for_x_y = -0.2
@@ -69,7 +74,8 @@ x_b_max_for_x_y = 13
 y_b_max_for_x_y = 0.7
 
 # y-z grid boundaries of y-z-plane (=> factor*2*Radius in meters) => Hub = coordinate origin
-cylindrical_grid = true     # if true, a cylindrical grid with the size of the turbine radius is calculated (disregards the following variables)
+cylindrical_grid = true     # if true, a cylindrical grid with the size of cylinder_radius*R is calculated (disregards the following variables)
+cylinder_radius = 2.0
 y_b_min_for_y_z = -0.7
 z_b_min_for_y_z = -0.7
 y_b_max_for_y_z = 0.7
@@ -122,6 +128,10 @@ end
 
 if @isdefined all_tstep_n_lastRevs
     n_lastRevs = all_tstep_n_lastRevs
+end
+
+if @isdefined max_particles
+    max_particles_fdom = max_particles
 end
 
 # set the foldername and save path automatically
@@ -183,6 +193,7 @@ if calc_grid_x_y
         OwnFunctions.postprocess_fluiddomain(simulation_path, sim_name, file_suffix, Radius, AOA_fdom, tsteps;
                                              # ----- OPTIONAL ARGUMENTS ----------
                                              save_path       = save_path_fdom,               # folder to store data in (if nothing, data will be stored under simulation_path)
+                                             max_particles   = max_particles_fdom,                # Maximum number of particles
                                              # ----- FREESTREAM VELOCITY ---------
                                              Vinf            = Vinf_fdom,
                                              # ----- GRID OPTIONS ----------------  
@@ -226,8 +237,8 @@ if calc_grid_y_z
             x_b_min = 0.0
             #y_b_min_for_y_z = 0.0
             z_b_min_for_y_z = (-(vol_thickness/2)/(2*Radius))+x_loc
-            # grid maximum boundaries (bound_factor*2*Radius in meters)
-            x_b_max = 1.0
+            # grid maximum boundaries (bound_factor*Radius in meters) = radius of the cylindrical plane
+            x_b_max = cylinder_radius
             #y_b_max_for_y_z = 2*pi
             z_b_max_for_y_z = ((vol_thickness/2)/(2*Radius))+x_loc
             
@@ -252,6 +263,7 @@ if calc_grid_y_z
         OwnFunctions.postprocess_fluiddomain(simulation_path, sim_name, file_suffix, Radius, AOA_fdom, tsteps;
                                              # ----- OPTIONAL ARGUMENTS ----------
                                              save_path       = save_path_fdom,               # folder to store data in (if nothing, data will be stored under simulation_path)
+                                             max_particles   = max_particles_fdom,           # Maximum number of particles
                                              # ----- FREESTREAM VELOCITY ---------
                                              Vinf            = Vinf_fdom,
                                              # ----- GRID OPTIONS ----------------  

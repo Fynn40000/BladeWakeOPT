@@ -26,6 +26,7 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          magVinf,
                                          AOA;
                                          # ---- OPTIONAL ARGUMENTS ---------
+                                         twist_overwrite =    false,                    # user defined twist distribution
                                          rho             =    1.225,
                                          mu              =    1.81e-5,
                                          speedofsound    =    342.35,
@@ -244,7 +245,22 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
   println("    Generating geometry...")
 
   # Generate rotor
-  rotor = uns.generate_rotor(rotor_file; pitch=pitch,
+  if twist_overwrite == false
+    rotor = uns.generate_rotor(rotor_file; pitch=pitch,
+                                            n=n, CW=CW, blade_r=r,
+                                            altReD=[RPM, J, mu/rho],
+                                            xfoil=xfoil,
+                                            ncrit=ncrit,
+                                            turbine_flag=turbine_flag,
+                                            #aoa_bounds=aoa_bounds,
+                                            data_path=data_path,
+                                            verbose=false,#true,
+                                            verbose_xfoil=false,
+                                            plot_disc=true,
+                                            save_polars=save_path
+                                            );
+  else # create rotor with user defined twist if twist was provided
+    rotor = OwnFunctions.generate_rotor(rotor_file; pitch=pitch,
                                           n=n, CW=CW, blade_r=r,
                                           altReD=[RPM, J, mu/rho],
                                           xfoil=xfoil,
@@ -255,8 +271,10 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                           verbose=false,#true,
                                           verbose_xfoil=false,
                                           plot_disc=true,
-                                          save_polars=save_path
-                                          );
+                                          save_polars=save_path,
+                                          twist_overwrite = twist_overwrite,
+                                          twist_interpolation=true);
+  end
 
   println("    Generating vehicle...")
 
@@ -408,6 +426,7 @@ monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx,
                                                             plot_bladeloads=plot_bladeloads,       # postprocessing the bladeloads?
                                                             postprocess_fdom=postprocess_fdom,     # postprocessing the fluiddomain?
                                                             # ----- SETTINGS FOR POSTPROCESSING -------------
+                                                            max_particles = max_particles,         # number of maximum particles
                                                             Vinf = Vinf,                           # Freestream Velocity
                                                             magVinfx = magVinfx,                   # Freestream Velocity in x direction
                                                             sim_time = ttot,                       # Overall (real) simulation time in seconds

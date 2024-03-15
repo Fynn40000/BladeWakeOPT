@@ -9,33 +9,33 @@
   * Last updated    : Jan 2024
   * License         : -
 =###############################################################################
-#include(joinpath("/home/fynn/Repositories/BladeWakeOPT/02_parameter_study/Convergence/ParameterStudy-Time_Steps.jl"))
+#include(joinpath("/home/fynn/Repositories/BladeWakeOPT/02_parameter_study/ParameterSpace/ParameterStudy-Twist_Angle.jl"))
 
 # ----------------- IMPORT PACKAGES --------------------------------------------------------
 start_simulation_path = splitdir(@__FILE__)[1]
 include(joinpath(start_simulation_path, "..", "..", "functions", "OwnFunctions.jl"))        # Read file with module definition first
 using .OwnFunctions                                                                         # Include all self defined functions
+import DataFrames
 
 
 # ----------------- SETTINGS ---------------------------------------------------------------
 # => FOLDER SETTINGS:
-save_folder                 = "ParameterStudy-Time_Steps"                       # Folder to store all simulations in
-param_study_folderprefix    = "NREL5MW_TimeSteps"                                # Prefix of the folders each simulation will be stored in
+save_folder                 = "ParameterStudy-Twist_Angle"                       # Folder to store all simulations in
+param_study_folderprefix    = "NREL5MW_TwistAngle"                                # Prefix of the folders each simulation will be stored in
 save_path                   = joinpath(start_simulation_path, save_folder)          # Where to save this parameter study
 
 # => ROTOR SPECIFICATIONS:
 rotor_file      = "NREL5MW.csv"                                                     # Rotor geometry
 data_path       = joinpath(start_simulation_path, "..", "..", "00_database")        # Path to rotor database
 
+# read in the different twist distributions to be varied
+twists = OwnFunctions.DataFrame(OwnFunctions.CSV.File(joinpath(start_simulation_path, "scaled_twists.csv")))
+
 # => SIMULATION LENGTH SETTINGS:
-nrevs           = 33                                                                # Number of revolutions to run
-#n               = 50                                                                # Number of blade elements per blade
+nrevs           = 1#33                                                                # Number of revolutions to run
+n               = 20                                                                # Number of blade elements per blade
+nsteps_per_rev = 36#100                                                                # Number of steps per revolution
 
-
-# => FIDELITY PARAMETERS:
-#nsteps_per_rev  = 72                                                                # Number of steps per revolution
-#parameters      = [20,30]#collect(30:10:40)#collect(10:10:200)                                                # THIS IS THE ARRAY THAT CONTAINS THE VALUES OF THE PARAMETER THAT WILL BE VARIED!!!
-parameters      = [36, 45, 55, 72, 90, 120, 180]
 
 # => OPERATING CONDITIONS:
 RPM             = 12.1*8/11.4                                                              # Rotational speed (1/min)
@@ -47,7 +47,7 @@ mu              = 1.789e-5                                                      
 speedofsound    = 342.35                                                            # Speed of sound (m/s)
 
 # => POSTPROCESSING AND VISUALIZATION
-postprocessing          = true                                                      # Perform postprocessing in general???
+postprocessing          = false#true                                                      # Perform postprocessing in general???
 debug                   = true                                                      # Enables calculation of coefficients such as cn, ct, cl, cd
 plot_bladeloads         = true                                                      # Postprocess the blade loads and plot the radial distribution (plots will be saved in "postprocessing folder")
 show_bladeload_plots    = false                                                     # Show the bladeload plots on display after each simulation?
@@ -58,7 +58,8 @@ cylindrical_grid        = true                                                  
                                                                                     # this grid will be set automatically with the turbine diameter as its diameter
 
 # => OTHER:
-p_per_step      = 2#4                                                                 # Particles shed per step
+p_per_step      = 2                                                                 # Particles shed per step
+
 
 
 # ----------------- START PARAMETERSTUDY ---------------------------------------------------
@@ -68,17 +69,19 @@ println("START PARAMETERSTUDY $(param_study_folderprefix)")
 println("################################################################################")
 start_time_overall = time()
 
-for i in parameters
+for i in 1:2:DataFrames.ncol(twists)
     start_time = time()
+    twist_name = chop(DataFrames.names(twists)[i], tail=2)
+    twist = Array{Float64, 2}(twists[:,i:i+1])
+
     println("\n--------------------------------------------------------------------------------")
     println("--------------------------------------------------------------------------------")
     println("--------------------------------------------------------------------------------")
     println("--------------------------------------------------------------------------------")
-    println("EVALUATING "*param_study_folderprefix*"_$(i) SIMULATION...")
+    println("EVALUATING "*param_study_folderprefix*"_$(twist_name) SIMULATION...")
 
-    nsteps_per_rev = i # set the parameter to be varied
-    save_path_temp = joinpath(save_path, param_study_folderprefix*"_$(i)")
-    run_name = param_study_folderprefix*"_$(i)"
+    save_path_temp = joinpath(save_path, param_study_folderprefix*"_$(twist_name)")
+    run_name = param_study_folderprefix*"_$(twist_name)"
 
     OwnFunctions.start_single_turbine_simulation(
                                     # ---- ESSENTIAL ARGUMENTS ---------
@@ -94,6 +97,7 @@ for i in parameters
                                     magVinf,
                                     AOA;
                                     # ---- OPTIONAL ARGUMENTS ---------
+                                    twist_overwrite =   twist,                            # scaled new twist distribution
                                     rho             =   rho,
                                     mu              =   mu,
                                     speedofsound    =   speedofsound,
