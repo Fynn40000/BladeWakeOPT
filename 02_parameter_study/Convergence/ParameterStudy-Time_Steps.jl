@@ -29,13 +29,13 @@ data_path       = joinpath(start_simulation_path, "..", "..", "00_database")    
 
 # => SIMULATION LENGTH SETTINGS:
 nrevs           = 33                                                                # Number of revolutions to run
-#n               = 50                                                                # Number of blade elements per blade
+n               = 75                                                                # Number of blade elements per blade
 
 
 # => FIDELITY PARAMETERS:
 #nsteps_per_rev  = 72                                                                # Number of steps per revolution
 #parameters      = [20,30]#collect(30:10:40)#collect(10:10:200)                                                # THIS IS THE ARRAY THAT CONTAINS THE VALUES OF THE PARAMETER THAT WILL BE VARIED!!!
-parameters      = [36, 45, 55, 72, 90, 120, 180]
+parameters      = [80, 90, 103, 120, 144, 180]#36, 45, 55, 72,
 
 # => OPERATING CONDITIONS:
 RPM             = 12.1*8/11.4                                                              # Rotational speed (1/min)
@@ -115,7 +115,7 @@ for i in parameters
 
     elapsed_time_s = time() - start_time
     # save time
-    open(joinpath(save_path_temp, "00_elapsed_time.txt"), "w") do file
+    open(joinpath(save_path_temp, "00_elapsed_time_overall.txt"), "w") do file
       write(file, string(floor(elapsed_time_s)))
     end
 

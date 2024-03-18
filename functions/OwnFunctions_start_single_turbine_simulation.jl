@@ -47,6 +47,7 @@ function start_single_turbine_simulation(# ---- ESSENTIAL ARGUMENTS ---------
                                          cylinder_radius         = 2                          # set the cylinder radius (factor*R)
                                          )
 
+  st_time = time()
 
   save_path_post  = joinpath(save_path, "postprocessing")                           # Where to save postprocessing plots
   fidelity = fidelity_extension
@@ -413,7 +414,11 @@ monitor_rotor = generate_monitor_turbines(rotors, J, rho, RPM, nsteps, magVinfx,
                       nsteps_save=1
                       );
 
-
+  elapsed_t_s = time() - st_time
+  # save time
+  open(joinpath(save_path, "00_elapsed_time_simulation.txt"), "w") do file
+    write(file, string(floor(elapsed_t_s)))
+  end
   
   # ------------- 6) POSTPROCESSING ----------------------------------------------
   if postprocessing

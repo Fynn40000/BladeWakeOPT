@@ -114,7 +114,7 @@ for i in parameters
 
     elapsed_time_s = time() - start_time
     # save time
-    open(joinpath(save_path_temp, "00_elapsed_time.txt"), "w") do file
+    open(joinpath(save_path_temp, "00_elapsed_time_overall.txt"), "w") do file
       write(file, string(floor(elapsed_time_s)))
     end
 
