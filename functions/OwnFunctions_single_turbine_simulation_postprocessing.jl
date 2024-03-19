@@ -88,8 +88,9 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     # set time steps to be postprocessed via the postprocess_fluiddomain function
     timesteps_to_evaluate = tsteps
 
-
-
+    suppress_x_y_plane_for_tstep_study = true
+    timesteps_to_evaluate_new = [tsteps[end]]
+    if suppress_x_y_plane_for_tstep_study
     # --------------- postprocess x-y-plane -------------------
 
     z_loc = 0   # z coordinate location of plane = z_loc*2*R in meters
@@ -111,10 +112,10 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     y_b_max = 0.7
     z_b_max = ((vol_thickness/2)/(2*R))+z_loc # choose volume that has a thickness of vol_thickness meter in the z-dimension (-0.5m under z_loc and +0.5m over z_loc)
 
-    OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
+    OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate_new;
                                          # ----- FREESTREAM VELOCITY ---------
                                          Vinf            = Vinf,
-                                         ax_particles    = max_particles,         # number of maximum particles
+                                         max_particles    = max_particles,         # number of maximum particles
                                          # ----- GRID OPTIONS ----------------  
                                          x_resolution    = x_res,                   # discretization of grid in x-direction
                                          y_resolution    = y_res,                   # discretization of grid in y-direction
@@ -131,12 +132,14 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
                                          first_fdom      = false                    # prevents question if fluiddomain postprocessing folder should be removed or not
                                          )
 
-
+    end
 
     # --------------- postprocess y-z-plane -------------------
 
-    x_max_calc = floor(x_max_calc)
-    for x in 1:1:x_max_calc # x represents the x-coordinate stations a y-z-plane will be calculated for
+    #x_max_calc = floor(x_max_calc)
+    x_max_calc = [1,4,7,9]
+    #for x in 1:1:x_max_calc # x represents the x-coordinate stations a y-z-plane will be calculated for
+    for x in x_max_calc
       x_loc = x   # x coordinate location of plane = x_loc*2*R in meters
       file_suffix = "_y_z_atx$(x_loc)D"
       push!(file_suffixes, file_suffix)
@@ -182,7 +185,7 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
       OwnFunctions.postprocess_fluiddomain(simulation_path, run_name, file_suffix, R, AOA, timesteps_to_evaluate;
                                           # ----- FREESTREAM VELOCITY ---------
                                           Vinf            = Vinf,
-                                          ax_particles    = max_particles,         # number of maximum particles
+                                          max_particles    = max_particles,         # number of maximum particles
                                           # ----- GRID OPTIONS ----------------  
                                           x_resolution    = x_res,                   # discretization of grid in x-direction
                                           y_resolution    = y_res,                   # discretization of grid in y-direction
