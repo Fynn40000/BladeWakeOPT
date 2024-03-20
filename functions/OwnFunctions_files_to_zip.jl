@@ -53,34 +53,37 @@ function files_to_zip(source_folder::String, destination_folder::String, last_st
     for file in readdir(source_folder)
         source_file_path = joinpath(source_folder, file)
 
-        # Überprüfen, ob die Datei eine CSV-Datei ist
+        # construct destination folder path
+        destination_file_path = joinpath(destination_folder, file)
+
+        # Check if file is .csv file
         if (isfile(source_file_path) && endswith(file, ".csv")) || 
             (isfile(source_file_path) && endswith(file, ".txt"))
-            # Konstruieren des Ziel-Pfades
-            destination_file_path = joinpath(destination_folder, file)
-
-            # Kopieren der CSV-Datei in den Zielordner
+            # copy file in source folder
             cp(source_file_path, destination_file_path)
 
-        # Überprüfen, ob die Datei dem Muster entspricht und die Zahl im angegebenen Bereich liegt
+        # Check if file is pfield file
         elseif isfile(source_file_path) && occursin(r"_pfield\.(\d+)\.", file)
             number = parse(Int, match(r"_pfield\.(\d+)\.", file).captures[1])
             if highest_number- last_steps_number <= number <= highest_number
-                # Konstruieren des Ziel-Pfades
-                destination_file_path = joinpath(destination_folder, file)
-
-                # Kopieren der Datei in den Zielordner
+                # copy file in source folder
                 cp(source_file_path, destination_file_path)
             end
+
         elseif isfile(source_file_path) && occursin(r"_staticpfield\.(\d+)\.", file)
             number = parse(Int, match(r"_staticpfield\.(\d+)\.", file).captures[1])
             if highest_number- last_steps_number -1 <= number <= highest_number
-                # Konstruieren des Ziel-Pfades
-                destination_file_path = joinpath(destination_folder, file)
-
-                # Kopieren der Datei in den Zielordner
+                # copy file in source folder
                 cp(source_file_path, destination_file_path)
             end
+            
+        elseif isfile(source_file_path) && occursin(r"_fdom\.(\d+)\.", file)
+            number = parse(Int, match(r"_fdom\.(\d+)\.", file).captures[1])
+            if highest_number- last_steps_number -1 <= number <= highest_number
+                # copy file in source folder
+                cp(source_file_path, destination_file_path)
+            end
+
         end
 
     end

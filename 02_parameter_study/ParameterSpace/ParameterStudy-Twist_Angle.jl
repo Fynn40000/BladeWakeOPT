@@ -32,14 +32,14 @@ data_path       = joinpath(start_simulation_path, "..", "..", "00_database")    
 twists = OwnFunctions.DataFrame(OwnFunctions.CSV.File(joinpath(start_simulation_path, "scaled_twists.csv")))
 
 # => SIMULATION LENGTH SETTINGS:
-nrevs           = 1#33                                                                # Number of revolutions to run
-n               = 20                                                                # Number of blade elements per blade
-nsteps_per_rev = 36#100                                                                # Number of steps per revolution
+nrevs           = 33                                                                # Number of revolutions to run
+n               = 75                                                                # Number of blade elements per blade
+nsteps_per_rev = #36#100                                                                # Number of steps per revolution
 
 
 # => OPERATING CONDITIONS:
-RPM             = 12.1*8/11.4                                                              # Rotational speed (1/min)
-magVinf         = 8                                                                 # Free stream wind speed (m/s)
+RPM             = 12.1                                                              # Rotational speed (1/min)
+magVinf         = 11.4                                                                 # Free stream wind speed (m/s)
 AOA             = 0.0                                                               # Angle of Attack (deg)
 
 rho             = 1.225                                                             # Air density (kg/m^3)
@@ -47,7 +47,7 @@ mu              = 1.789e-5                                                      
 speedofsound    = 342.35                                                            # Speed of sound (m/s)
 
 # => POSTPROCESSING AND VISUALIZATION
-postprocessing          = false#true                                                      # Perform postprocessing in general???
+postprocessing          = true                                                      # Perform postprocessing in general???
 debug                   = true                                                      # Enables calculation of coefficients such as cn, ct, cl, cd
 plot_bladeloads         = true                                                      # Postprocess the blade loads and plot the radial distribution (plots will be saved in "postprocessing folder")
 show_bladeload_plots    = false                                                     # Show the bladeload plots on display after each simulation?

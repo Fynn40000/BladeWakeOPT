@@ -88,9 +88,9 @@ function single_turbine_simulation_postprocessing(simulation_path::String, save_
     # set time steps to be postprocessed via the postprocess_fluiddomain function
     timesteps_to_evaluate = tsteps
 
-    suppress_x_y_plane_for_tstep_study = true
+    suppress_x_y_plane_for_tstep_study = false
     timesteps_to_evaluate_new = [tsteps[end]]
-    if suppress_x_y_plane_for_tstep_study
+    if !suppress_x_y_plane_for_tstep_study
     # --------------- postprocess x-y-plane -------------------
 
     z_loc = 0   # z coordinate location of plane = z_loc*2*R in meters

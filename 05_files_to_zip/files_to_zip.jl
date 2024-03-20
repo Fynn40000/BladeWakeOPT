@@ -10,23 +10,23 @@ using .OwnFunctions
 
 
 # ----------------- ENTER ALL SIMULATION FOLDER PATHS TO BE COPIED --------------------------------------------------------  
-    # BLADE ELEMENT STUDY
-study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Blade_Elements")
-BEs = [170]
-sim_folders = []
-for BE in BEs
-    push!(sim_folders, joinpath(study_folder, "NREL5MW_BladeElement_$(BE)"))
-end
-last_steps_number = 100 # COPY THIS MANY LAST TIME STEPS
-
-#     # TIME STEPS STUDY
-# study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Time_Steps")
-# tsteps = [80, 90, 103, 120, 144, 180]
+#     # BLADE ELEMENT STUDY
+# study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Blade_Elements")
+# BEs = [170]
 # sim_folders = []
-# for tstep in tsteps
-#     push!(sim_folders, joinpath(study_folder, "NREL5MW_TimeSteps_$(tstep)"))
+# for BE in BEs
+#     push!(sim_folders, joinpath(study_folder, "NREL5MW_BladeElement_$(BE)"))
 # end
-# last_steps_number = 200 # COPY THIS MANY LAST TIME STEPS
+# last_steps_number = 100 # COPY THIS MANY LAST TIME STEPS
+
+    # TIME STEPS STUDY
+study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Time_Steps")
+tsteps = [80, 90, 103, 120, 144, 180]
+sim_folders = []
+for tstep in tsteps
+    push!(sim_folders, joinpath(study_folder, "NREL5MW_TimeSteps_$(tstep)"))
+end
+last_steps_number = 200 # COPY THIS MANY LAST TIME STEPS
 
 #     # TWIST STUDY
 # study_folder = joinpath(this_file_path, "..", "02_parameter_study", "ParameterSpace", "ParameterStudy-Twist_Angle")

@@ -25,7 +25,7 @@ using .OwnFunctions                                                             
 # ----------------- 0) SPECIFY SIMULATION TO BE POSTPROCESSED AND FOLDER TO STORE DATA IN ------
 
 # Folders and paths
-sim_name = "NREL5MW_BladeElement_135"                                                                        # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+sim_name = "NREL5MW_BladeElement_170"                                                                        # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", sim_name)   # Folder of simulation to be evaluated
 
 
@@ -54,7 +54,7 @@ n_lastRevs      = 1                                                             
 
 B = 3 #blade number
 p_per_step = 2 # was always set to 2 during the studies (particle sheds per time step)
-n = 100
+n = 170
 max_particles_fdom   = ((2*n+1)*B)*nsteps_per_rev_fdom*nrevs_fdom*p_per_step + 1 # Maximum number of particles
 
 # grid to be calculated
