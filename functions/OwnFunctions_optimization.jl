@@ -10,7 +10,9 @@
   * License         : -
 =###############################################################################
 
-# Function to create sampling points via Latin Hypercube Sampling
+"
+Function to create sampling points via Latin Hypercube Sampling.
+"
 function get_solution_points(method, Nsamples, Ndimensions, dim_ranges, generations)
 
     if method == "random"
@@ -26,27 +28,10 @@ function get_solution_points(method, Nsamples, Ndimensions, dim_ranges, generati
     return lhs
 end
 
-# "
-# Calculate the Bernstein polynomial B_i,n(t).
-# "
-# function bernstein_poly(i, n, t)
-#     return binomial(n, i) * (t ^ i) * ((1 - t) ^ (n - i))
-# end
 
-
-# "
-# Calculate the value of a Bézier curve for a specific parameter t.
-# "
-# function bezier_curve(control_points, t)
-    
-#     n = length(control_points) - 1
-#     curve_point = zeros(size(control_points[1]))
-#     for (i, point) in enumerate(control_points)
-#         curve_point .+= point * bernstein_poly(i, n, t)
-#     end
-#     return curve_point
-# end
-
+"
+Calculate the value of a Bézier curve for a specific parameter t.
+"
 function bezier_point(t::Float64, control_points::Array{Array{Float64,1},1})
     n = length(control_points) - 1
     result = [0.0, 0.0]

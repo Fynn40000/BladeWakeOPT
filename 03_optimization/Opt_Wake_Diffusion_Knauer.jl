@@ -40,7 +40,7 @@ method = "optimized"                                                            
 Nsamples = 15
 Ndimensions = 2
 dim_ranges = [(lower_bound[1], upper_bound[1]), (lower_bound[2], upper_bound[2])]
-generations = 200                                                                     # used when method == "optimization"
+generations = 2000                                                                     # used when method == "optimization"
 
 # ----------------- SIMULATION SETTINGS -------------------------------------------------------- 
 # => FOLDER SETTINGS:
