@@ -19,26 +19,26 @@ using .OwnFunctions
 # end
 # last_steps_number = 100 # COPY THIS MANY LAST TIME STEPS
 
-    # TIME STEPS STUDY
-study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Time_Steps")
-tsteps = [80, 90, 103, 120, 144, 180]
-sim_folders = []
-for tstep in tsteps
-    push!(sim_folders, joinpath(study_folder, "NREL5MW_TimeSteps_$(tstep)"))
-end
-last_steps_number = 200 # COPY THIS MANY LAST TIME STEPS
+#     # TIME STEPS STUDY
+# study_folder = joinpath(this_file_path, "..", "02_parameter_study", "Convergence", "ParameterStudy-Time_Steps")
+# tsteps = [80, 90, 103, 120, 144, 180]
+# sim_folders = []
+# for tstep in tsteps
+#     push!(sim_folders, joinpath(study_folder, "NREL5MW_TimeSteps_$(tstep)"))
+# end
+# last_steps_number = 200 # COPY THIS MANY LAST TIME STEPS
 
-#     # TWIST STUDY
-# study_folder = joinpath(this_file_path, "..", "02_parameter_study", "ParameterSpace", "ParameterStudy-Twist_Angle")
-# sim_folders = [joinpath(study_folder, "NREL5MW_TwistAngle_Knauer"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_Kelley"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_LLR"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_HLR"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_2BC"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_2BC"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_4BC"),
-#                joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_4BC")]
-# last_steps_number = 10 # COPY THIS MANY LAST TIME STEPS
+    # TWIST STUDY
+study_folder = joinpath(this_file_path, "..", "02_parameter_study", "ParameterSpace", "ParameterStudy-Twist_Angle")
+sim_folders = [joinpath(study_folder, "NREL5MW_TwistAngle_Knauer"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_Kelley"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_LLR"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_HLR"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_2BC"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_2BC"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_4BC"),
+               joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_4BC")]
+last_steps_number = 130 # COPY THIS MANY LAST TIME STEPS
 
 
 

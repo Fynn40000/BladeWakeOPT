@@ -34,7 +34,7 @@ twists = OwnFunctions.DataFrame(OwnFunctions.CSV.File(joinpath(start_simulation_
 # => SIMULATION LENGTH SETTINGS:
 nrevs           = 33                                                                # Number of revolutions to run
 n               = 75                                                                # Number of blade elements per blade
-nsteps_per_rev = #36#100                                                                # Number of steps per revolution
+nsteps_per_rev = 120                                                                # Number of steps per revolution
 
 
 # => OPERATING CONDITIONS:

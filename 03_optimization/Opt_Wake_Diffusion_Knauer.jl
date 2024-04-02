@@ -37,7 +37,7 @@ lower_bound = [LB_ventilation, LB_SF]
 upper_bound = [UB_ventilation, UB_SF]
   # !!! the following variables only apply when "use_freezed_points = false" !!!
 method = "optimized"                                                                  # sampling method (Options: "optimized", "random")
-Nsamples = 15
+Nsamples = 10
 Ndimensions = 2
 dim_ranges = [(lower_bound[1], upper_bound[1]), (lower_bound[2], upper_bound[2])]
 generations = 2000                                                                     # used when method == "optimization"
@@ -55,7 +55,7 @@ data_path       = joinpath(start_simulation_path, "..", "00_database")          
 # => SIMULATION LENGTH SETTINGS:
 nrevs           = 33                                                                  # Number of revolutions to run
 n               = 75                                                                  # Number of blade elements per blade
-nsteps_per_rev = #36#100                                                              # Number of steps per revolution
+nsteps_per_rev = 120                                                              # Number of steps per revolution
 
 # => OPERATING CONDITIONS:
 RPM             = 12.1                                                                # Rotational speed (1/min)
@@ -67,7 +67,7 @@ mu              = 1.789e-5                                                      
 speedofsound    = 342.35                                                              # Speed of sound (m/s)
 
 # => POSTPROCESSING AND VISUALIZATION
-postprocessing          = false#true                                                        # Perform postprocessing in general???
+postprocessing          = true                                                        # Perform postprocessing in general???
 debug                   = true                                                        # Enables calculation of coefficients such as cn, ct, cl, cd
 plot_bladeloads         = true                                                        # Postprocess the blade loads and plot the radial distribution (plots will be saved in "postprocessing folder")
 show_bladeload_plots    = false                                                       # Show the bladeload plots on display after each simulation?
@@ -85,22 +85,47 @@ p_per_step      = 2                                                             
 if !use_freezed_points
   solution_points = OwnFunctions.get_solution_points(method, Nsamples, Ndimensions, dim_ranges, generations)
 else
-  solution_points = [0.4063488965714286 0.1428571428571428;
-                    0.3079361207142857 -0.2857142857142857;
-                    0.3571425086428571 0.8571428571428572;
-                    0.7015872241428572 1.0;
-                    0.4555552845 -1.0;
-                    0.5047616724285714 -0.4285714285714286; 
-                    0.7507936120714287 0.4285714285714286; 
-                    0.8 -0.5714285714285714; 
-                    0.20952334485714286 -0.7142857142857143; 
-                    0.111110569 -0.1428571428571429; 
-                    0.16031695692857142 0.7142857142857142; 
-                    0.6031744482857143 0.0; 
-                    0.2587297327857143 0.2857142857142858; 
-                    0.5539680603571429 0.5714285714285714; 
-                    0.6523808362142858 -0.8571428571428572]
-  #solution_points = [0.7507936120714287 0.4285714285714286]
+  # solution_points = [0.4063488965714286 0.1428571428571428;
+  #                   0.3079361207142857 -0.2857142857142857;
+  #                   0.3571425086428571 0.8571428571428572;
+  #                   0.7015872241428572 1.0;
+  #                   0.4555552845 -1.0;
+  #                   0.5047616724285714 -0.4285714285714286; 
+  #                   0.7507936120714287 0.4285714285714286; 
+  #                   0.8 -0.5714285714285714; 
+  #                   0.20952334485714286 -0.7142857142857143; 
+  #                   0.111110569 -0.1428571428571429; 
+  #                   0.16031695692857142 0.7142857142857142; 
+  #                   0.6031744482857143 0.0; 
+  #                   0.2587297327857143 0.2857142857142858; 
+  #                   0.5539680603571429 0.5714285714285714; 
+  #                   0.6523808362142858 -0.8571428571428572]
+  # #solution_points = [0.7507936120714287 0.4285714285714286]
+  # solution_points = [0.5047616724285714 -0.5714285714285714; 
+  #                    0.4063488965714286 0.5714285714285714; 
+  #                    0.16031695692857142 -0.7142857142857143; 
+  #                    0.4555552845 0.0; 
+  #                    0.20952334485714286 0.4285714285714286; 
+  #                    0.5539680603571429 0.8571428571428572; 
+  #                    0.7507936120714287 0.7142857142857142; 
+  #                    0.2587297327857143 1.0; 
+  #                    0.6523808362142858 -1.0; 
+  #                    0.6031744482857143 0.2857142857142858; 
+  #                    0.111110569 -0.1428571428571429; 
+  #                    0.3571425086428571 -0.8571428571428572; 
+  #                    0.7015872241428572 -0.4285714285714286; 
+  #                    0.8 0.1428571428571428; 
+  #                    0.3079361207142857 -0.2857142857142857]
+  solution_points = [0.34074037933333334 1.0; 
+                     0.1876538391111111 -0.11111111111111116; 
+                     0.41728364944444446 0.33333333333333326; 
+                     0.5703701896666667 -1.0; 
+                     0.6469134597777778 0.7777777777777777; 
+                     0.111110569 0.5555555555555556; 
+                     0.723456729888889 0.11111111111111116; 
+                     0.4938269195555555 -0.33333333333333337; 
+                     0.2641971092222222 -0.7777777777777778; 
+                     0.8 -0.5555555555555556]
 end
 
 # save the solution points in 2D array again
