@@ -51,6 +51,8 @@ Return a scaled twist distribution at x_values.
 "
 function get_scaled_twist(x_values, scaling_curve_x, scaling_curve_y, twist_ref, ref_LB, ref_UB)
     # interpolate scalig factors from scaling curve at twist locations
+    println(scaling_curve_x)
+    println(scaling_curve_y)
     itp = LinearInterpolation(scaling_curve_x, scaling_curve_y, extrapolation_bc=Line())
     scaling_factors = itp(x_values)
 

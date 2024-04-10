@@ -125,7 +125,12 @@ for i in 1:size(solution_points, 1)
   push!(sol_points, [solution_points[i, 1], solution_points[i, 2]])
 end
 
-# println(solution_points)
+println(solution_points)
+println(sol_points)
+for (sol_idx, solution) in enumerate(sol_points)
+  println(sol_idx)
+  println(solution)
+end
 # scatter(solution_points[:, 1], solution_points[:, 2], label="", xlabel="ventilation area", ylabel="scaling amount", legend=:topright)#, aspect_ratio=:equal
 
 

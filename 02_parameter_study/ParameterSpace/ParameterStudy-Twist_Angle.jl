@@ -29,7 +29,7 @@ rotor_file      = "NREL5MW.csv"                                                 
 data_path       = joinpath(start_simulation_path, "..", "..", "00_database")        # Path to rotor database
 
 # read in the different twist distributions to be varied
-twists = OwnFunctions.DataFrame(OwnFunctions.CSV.File(joinpath(start_simulation_path, "scaled_twists.csv")))
+twists = OwnFunctions.DataFrame(OwnFunctions.CSV.File(joinpath(start_simulation_path, "reference_turbine_twist.csv")))
 
 # => SIMULATION LENGTH SETTINGS:
 nrevs           = 33                                                                # Number of revolutions to run

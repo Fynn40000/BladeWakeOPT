@@ -40,6 +40,20 @@ sim_folders = [joinpath(study_folder, "NREL5MW_TwistAngle_Knauer"),
                joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_4BC")]
 last_steps_number = 130 # COPY THIS MANY LAST TIME STEPS
 
+#     # OPTIMIZATION STUDY
+# study_folder = joinpath(this_file_path, "..", "03_optimization", "solutions-Knauer_opt")
+# sim_folders = [joinpath(study_folder, "NREL5MW_solution_1"),
+#                 joinpath(study_folder, "NREL5MW_solution_2"),
+#                 joinpath(study_folder, "NREL5MW_solution_3"),
+#                 joinpath(study_folder, "NREL5MW_solution_4"),
+#                 joinpath(study_folder, "NREL5MW_solution_5"),
+#                 joinpath(study_folder, "NREL5MW_solution_6"),
+#                 joinpath(study_folder, "NREL5MW_solution_7"),
+#                 joinpath(study_folder, "NREL5MW_solution_8"),
+#                 joinpath(study_folder, "NREL5MW_solution_9"),
+#                 joinpath(study_folder, "NREL5MW_solution_10")]
+# last_steps_number = 130 # COPY THIS MANY LAST TIME STEPS
+
 
 
 # ----------------- CREATE "_to_zip" FOLDERS --------------------------------------------------------  
