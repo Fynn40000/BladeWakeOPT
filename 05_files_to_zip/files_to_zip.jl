@@ -31,13 +31,13 @@ using .OwnFunctions
     # TWIST STUDY
 study_folder = joinpath(this_file_path, "..", "02_parameter_study", "ParameterSpace", "ParameterStudy-Twist_Angle")
 sim_folders = [joinpath(study_folder, "NREL5MW_TwistAngle_Knauer"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_Kelley"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_LLR"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_HLR"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_2BC"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_2BC"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_4BC"),
-               joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_4BC")]
+                joinpath(study_folder, "NREL5MW_TwistAngle_Kelley"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_LLR"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_HLR"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_2BC"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_2BC"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_CBR1_4BC"),
+                joinpath(study_folder, "NREL5MW_TwistAngle_CBR2_4BC")]
 last_steps_number = 130 # COPY THIS MANY LAST TIME STEPS
 
 #     # OPTIMIZATION STUDY

@@ -62,17 +62,32 @@ function files_to_zip(source_folder::String, destination_folder::String, last_st
             # copy file in source folder
             cp(source_file_path, destination_file_path)
 
-        # Check if file is pfield file
+        # # Check if file is pfield file
+        # elseif isfile(source_file_path) && occursin(r"_pfield\.(\d+)\.", file)
+        #     number = parse(Int, match(r"_pfield\.(\d+)\.", file).captures[1])
+        #     if highest_number- last_steps_number <= number <= highest_number
+        #         # copy file in source folder
+        #         cp(source_file_path, destination_file_path)
+        #     end
+
+        # elseif isfile(source_file_path) && occursin(r"_staticpfield\.(\d+)\.", file)
+        #     number = parse(Int, match(r"_staticpfield\.(\d+)\.", file).captures[1])
+        #     if highest_number- last_steps_number -1 <= number <= highest_number
+        #         # copy file in source folder
+        #         cp(source_file_path, destination_file_path)
+        #     end
+
+        # copy only last pfield and staticpfield file
         elseif isfile(source_file_path) && occursin(r"_pfield\.(\d+)\.", file)
             number = parse(Int, match(r"_pfield\.(\d+)\.", file).captures[1])
-            if highest_number- last_steps_number <= number <= highest_number
+            if highest_number - 1 <= number <= highest_number
                 # copy file in source folder
                 cp(source_file_path, destination_file_path)
             end
-
+        
         elseif isfile(source_file_path) && occursin(r"_staticpfield\.(\d+)\.", file)
             number = parse(Int, match(r"_staticpfield\.(\d+)\.", file).captures[1])
-            if highest_number- last_steps_number -1 <= number <= highest_number
+            if highest_number - 1 <= number <= highest_number
                 # copy file in source folder
                 cp(source_file_path, destination_file_path)
             end
