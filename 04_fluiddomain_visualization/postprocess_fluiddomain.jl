@@ -25,17 +25,17 @@ using .OwnFunctions                                                             
 # ----------------- 0) SPECIFY SIMULATION TO BE POSTPROCESSED AND FOLDER TO STORE DATA IN ------
 
 # Folders and paths
-sim_name = "NREL5MW_BladeElement_170"                                                                        # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
+sim_name = "NREL5MW_solution_2"                                                                        # Name of simulation to be evaluated (typically the last folder name of "simulation_path")
 simulation_path = joinpath(this_file_path, "..", "01_single_turbine_simulation", "data_out", sim_name)   # Folder of simulation to be evaluated
 
 
-call_paraview = true#false                                                              # call paraview after postprocessing
+call_paraview = false                                                              # call paraview after postprocessing
 
 # turbine tip radius in (m)
 Radius = 63.0
 
 # Freestream reference wind speed
-magVinf_fdom    = 8#11.4                                                             # (m/s) Magnitude of free stream wind speed
+magVinf_fdom    = 11.4                                                             # (m/s) Magnitude of free stream wind speed
 AOA_fdom        = 0.0                                                              # (deg) Angle of attack (incidence angle)
 Vinf_fdom(X, t)      = magVinf_fdom*[cosd(AOA_fdom), sind(AOA_fdom), 0]            # wind speed in global coordinatesystem
 
@@ -44,17 +44,17 @@ tstep_method    = "manual"                                                      
 
 # => when "manual", these timesteps will be calculated
 #tsteps_manual = [2374]                                                         # set by specific timesteps manually chosen by the user
-tsteps_manual = collect(2302:2:2375)#collect(1749:2:1822)                                                   # set by own start, step and end time (start:step:end)
+tsteps_manual = collect(3830:2:3958)#collect(1749:2:1822)                                                   # set by own start, step and end time (start:step:end)
 
 # => following variables are necessary when using tstep_method = "all" or "last_Rev"
 nrevs_fdom      = 33                                                               # number of revolutions the simulation was simulated with
-nsteps_per_rev_fdom  = 72                                                          # number of steps per revolution the simulation was simulated with
-stepwidth       = 6                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
+nsteps_per_rev_fdom  = 120                                                          # number of steps per revolution the simulation was simulated with
+stepwidth       = 2                                                                # set this to e.g. 2 if you want to calculate each second timestep, to 3 if you want to calculate each third timestep, ... and so on
 n_lastRevs      = 1                                                               # number of last revolutions to be calculated (used if tstep_method = "last_Rev")
 
 B = 3 #blade number
 p_per_step = 2 # was always set to 2 during the studies (particle sheds per time step)
-n = 170
+n = 75
 max_particles_fdom   = ((2*n+1)*B)*nsteps_per_rev_fdom*nrevs_fdom*p_per_step + 1 # Maximum number of particles
 
 # grid to be calculated
@@ -65,7 +65,7 @@ gridsize_x_y    = 0.25      # grid size of x-y fluid domain plane in meters
 gridsize_y_z    = 0.25      # grid size of y-z fluid domain plane in meters
 
 z_locs          = [0]                                   # z coordinate location of x-y-plane = z_loc*2*Radius in meters
-x_locs          = [1, 4, 7, 9]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
+x_locs          = [1, 2, 3, 4, 5, 6, 7, 8, 9]       # x coordinate location of y-z-plane = x_loc*2*Radius in meters
 
 # x-y grid boundaries of x-y-plane (=> factor*2*Radius in meters) => Hub = coordinate origin
 x_b_min_for_x_y = -0.2
